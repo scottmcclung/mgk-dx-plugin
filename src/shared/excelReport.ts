@@ -1,6 +1,5 @@
 import {Workbook} from "exceljs";
-
-const Excel = require('exceljs');
+// const Excel = require('exceljs');
 import {headerMap, summaryHeaderMap} from './exportSettings';
 
 const headers = () => {
@@ -54,9 +53,9 @@ const generateObjectWorksheets = (workbook: Workbook, worksheetName: string, wor
   }
 }
 
-export default class XlsObjectScribe {
+export default class ExcelReport {
   public static write(filePath: string, metadata: Map<string, object>) {
-    const workbook = new Excel.Workbook();
+    const workbook = new Workbook();
     generateObjectSummaryWorksheet(workbook, metadata);
     for (const [key, sobject] of metadata.entries()) {
       generateObjectWorksheets(workbook, key, sobject);

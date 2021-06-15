@@ -1,9 +1,8 @@
 import {flags, FlagsConfig, SfdxCommand} from '@salesforce/command';
 import {Messages} from '@salesforce/core';
 import {AnyJson} from '@salesforce/ts-types';
-import CvsObjectScribe from '../../../shared/cvsObjectScribe';
 import {MetadataExport} from '../../../shared/metadataExport';
-import XlsObjectScribe from '../../../shared/xlsObjectScribe';
+import Report from "../../../shared/report";
 
 Messages.importMessagesDirectory(__dirname);
 
@@ -47,24 +46,14 @@ export default class MgkSchemaExport extends SfdxCommand {
   protected static requiresUsername = true;
 
   public async run(): Promise<AnyJson> {
-    const metadataExport = new MetadataExport({
-      org: this.org,
-      sobjects: this.flags.sobjects,
-      customObjectsOnly: this.flags.customobjectsonly
-    });
-    const metadata = await metadataExport.getExport();
-    this.outputToFile(metadata);
-  }
+    const org = this.org;
+    const format = this.flags.format;
+    const sobjects = this.flags.sobjects;
+    const targetPath = this.flags.targetpath;
+    const customObjectsOnly = this.flags.customobjectsonly;
 
-  protected async outputToFile(metadata) {
-    switch (this.flags.format) {
-      case 'xls':
-        XlsObjectScribe.write(this.flags.targetpath, metadata);
-        break;
-      case 'csv':
-        CvsObjectScribe.write(this.flags.targetpath, metadata);
-        break;
-      default:
-    }
+    const metadataExport = new MetadataExport({org, sobjects, customObjectsOnly});
+    const metadata = await metadataExport.getExport();
+    Report.write(format, targetPath, metadata);
   }
 }
