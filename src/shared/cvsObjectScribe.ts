@@ -11,14 +11,14 @@ const headers = () => {
 }
 
 export default class CvsObjectScribe {
-  public static async   write(filepath, metadata) {
+  public static async write(filePath: string, metadata: Map<string, object>) {
     const csvWriter = createCsvWriter({
       path: `${filePath}.csv`,
       header: headers()
     });
 
-    for (const sobject of metadata) {
-      await csvWriter.writeRecords(sobject.fields);
+    for (const [key,sobject] of metadata.entries()) {
+      await csvWriter.writeRecords(Array.from(sobject.fields.values()));
     }
   }
 }

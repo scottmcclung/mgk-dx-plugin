@@ -1,7 +1,7 @@
 const translatedFieldTypes = {
   id: 'Id',
   string: 'Text',
-  textarea: 'TextArea',
+  textarea: 'Text Area',
   url: 'Url',
   address: 'Address',
   int: 'Number',

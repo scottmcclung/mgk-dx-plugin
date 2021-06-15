@@ -2,64 +2,160 @@ import {Connection, Org} from '@salesforce/core';
 import translatedFieldTypes from './fieldTypes';
 
 export class MetadataExport {
+  protected _apiVersion: string;
   protected _org: Org;
   protected _sobjects: string[];
+  protected _sobjectMetadata = new Map();
+  protected _fieldMetadata;
+  protected _customObjectsOnly = false;
 
   constructor(settings) {
+    this._apiVersion = '51.0';
     this._org = settings.org;
     this._sobjects = settings.sobjects || [];
+    this._customObjectsOnly = settings.customObjectsOnly || false;
   }
 
   public async getExport() {
-    const sobjectNames = await this.getSobjectNames(this._sobjects);
-    return await this.getMetadata(sobjectNames);
+    this._sobjectMetadata = new Map();
+    await this.getSobjectMetadata(this._sobjects);
+    await this.getDescribeMetadata(Array.from(this._sobjectMetadata.keys()));
+    return this._sobjectMetadata;
   }
 
-  /**
-   * Returns an array of sobject names to get metadata for
-   * If the user has not specified the list of sobjects, return a full list from the org
-   * @param sobjectNames
-   * @protected
-   */
-  protected async getSobjectNames(sobjectNames: any[]): any[] {
-    if(sobjectNames.length > 0) return sobjectNames;
-    const strSoql = "SELECT QualifiedApiName FROM EntityDefinition WHERE IsCustomizable = true AND PublisherId IN ('System','<local>') ORDER BY QualifiedApiName ASC";
-    const schemaDescribe = await this._org.getConnection().query(strSoql);
-    return schemaDescribe.records.map(object => object.QualifiedApiName);
+  protected async getSobjectMetadata(sobjectNames: any[]) {
+    const sobjectFilter = sobjectNames.length > 0 ? `AND QualifiedApiName IN (${sobjectNames.map(name => `'${name}'`).join(',')})` : '';
+    const strSoql = `
+            SELECT DurableId,DeveloperName,QualifiedApiName,KeyPrefix,Label,PluralLabel,ExternalSharingModel,InternalSharingModel,PublisherId,HelpSettingPageName,HelpSettingPageUrl
+            FROM EntityDefinition
+            WHERE IsCustomizable = true
+            AND PublisherId IN ('System','<local>')
+            ${sobjectFilter}
+            ORDER BY QualifiedApiName ASC
+            `;
+    const entities = await this._org.getConnection().query(strSoql);
+    if (entities.records) {
+      for (const object of entities.records) {
+        if (this._customObjectsOnly && !object.QualifiedApiName.endsWith('__c')) continue;
+        this._sobjectMetadata.set(object.QualifiedApiName, {
+          DurableId: object.DurableId,
+          DeveloperName: object.DeveloperName,
+          QualifiedApiName: object.QualifiedApiName,
+          KeyPrefix: object.KeyPrefix,
+          Label: object.Label,
+          PluralLabel: object.PluralLabel,
+          ExternalSharingModel: object.ExternalSharingModel,
+          InternalSharingModel: object.InternalSharingModel,
+          PublisherId: object.PublisherId,
+          HelpSettingPageName: object.HelpSettingPageName,
+          HelpSettingPageUrl: object.HelpSettingPageUrl
+        });
+      }
+    }
+
+    const metadata = await this._org.getConnection().metadata.list([{
+      type: 'CustomObject'
+    }], this._apiVersion);
+    if (metadata) {
+      for (const object of metadata) {
+        if (!object.fullName || !this._sobjectMetadata.has(object.fullName)) continue;
+        this._sobjectMetadata.set(object.fullName, Object.assign(this._sobjectMetadata.get(object.fullName), {
+          createdById: object.createdById,
+          createdByName: object.createdByName,
+          createdDate: object.createdDate,
+          id: object.id,
+          lastModifiedById: object.lastModifiedById,
+          lastModifiedByName: object.lastModifiedByName,
+          lastModifiedDate: object.lastModifiedDate,
+          namespacePrefix: object.namespacePrefix || ''
+        }));
+      }
+    }
   }
+
 
   /**
    * Returns an array of metadata with the fields already normalized
    * @param sobjectNames
    * @protected
    */
-  protected async getMetadata(sobjectNames: string[]): any[] {
+  protected async getDescribeMetadata(sobjectNames: string[]): any[] {
     const metadata = await this._org.getConnection().batchDescribe({
       types: sobjectNames
     });
-    return this.normalizeFieldMetadata(metadata);
+    for (const object of metadata) {
+      if (!this._sobjectMetadata.has(object.name)) continue;
+
+      const fieldMap = new Map();
+      const fieldDescribeMap = this.getFieldDescribeMap(object.fields, object.name);
+      for (const [key, value] of fieldDescribeMap) {
+        if (!fieldMap.has(key)) fieldMap.set(key, value);
+        else fieldMap.set(key, Object.assign(fieldMap.get(key), value));
+      }
+      const fieldDefinitionMap = await this.getFieldDefinitionMapByObject(object.name);
+      for (const [key, value] of fieldDefinitionMap) {
+        if (fieldMap.has(key)) fieldMap.set(key, Object.assign(fieldMap.get(key), value));
+      }
+
+      const objectDefinition = Object.assign(this._sobjectMetadata.get(object.name), {
+        fields: fieldMap,
+        childRelationships: object.childRelationships
+      });
+
+      this._sobjectMetadata.set(object.name, objectDefinition);
+    }
   }
 
-  protected normalizeFieldMetadata(sobjectArray: any[]) {
-    return sobjectArray.map(sobject => {
-      sobject.fields = sobject.fields.map(field => {
-        return {
-          object: sobject.name,
-          apiName: field.name,
-          label: field.label,
-          helpText: field.inlineHelpText,
-          dataType: this.formattedDataType(field),
-          required: field.nillable ? 'No' : 'Yes',
-          unique: field.unique ? 'Yes' : 'No',
-          externalId: field.externalkey ? 'Yes' : 'No',
-          caseSensitive: field.caseSensitive ? 'Yes' : 'No',
-          formula: field.calculatedFormula,
-          defaultValue: this.formattedDefaultValue(field),
-          encrypted: field.encrypted ? 'Yes' : 'No',
-        };
+  protected getFieldDescribeMap(fields: any[], objectName: string) {
+    const fieldDescribeMap = new Map();
+    if (!fields) return fieldDescribeMap;
+    for (const field of fields) {
+      fieldDescribeMap.set(field.name, this.normalizeFieldMetadata(field, objectName));
+    }
+    return fieldDescribeMap;
+  }
+
+  protected async getFieldDefinitionMapByObject(objectName: string) {
+    const fieldDefinitionMap = new Map();
+    if (!objectName) return fieldDefinitionMap;
+
+    const fieldDefinitionSoql = `
+          SELECT Id,DurableId,Description,QualifiedApiName,PublisherId
+          FROM FieldDefinition
+          WHERE EntityDefinition.QualifiedApiName = '${objectName}'
+          `;
+    const fieldDefinitions = await this._org.getConnection().tooling.query(fieldDefinitionSoql);
+    if (fieldDefinitions) {
+      fieldDefinitions.records.forEach(field => {
+        fieldDefinitionMap.set(field.QualifiedApiName, {
+          object: objectName,
+          durableId: field.DurableId,
+          description: field.Description,
+          publisherId: field.PublisherId
+        });
       });
-      return sobject;
-    });
+    }
+    return fieldDefinitionMap;
+  }
+
+  protected normalizeFieldMetadata(field: object, objectName: string) {
+    return {
+      apiName: field.name,
+      label: field.label,
+      helpText: field.inlineHelpText,
+      dataType: this.formattedDataType(field),
+      required: field.nillable ? 'No' : 'Yes',
+      unique: field.unique ? 'Yes' : 'No',
+      externalId: field.externalkey ? 'Yes' : 'No',
+      caseSensitive: field.caseSensitive ? 'Yes' : 'No',
+      formula: field.calculatedFormula,
+      defaultValue: this.formattedDefaultValue(field),
+      encrypted: field.encrypted ? 'Yes' : 'No',
+      object: objectName,
+      durableId: null,
+      description: null,
+      publisherId: 'System'
+    };
   }
 
   protected formattedDataType(field): string {
@@ -74,7 +170,7 @@ export class MetadataExport {
       type = `${type}${translatedFieldTypes[field.type]}(${this.formattedPicklistValues(field.picklistValues)})`;
       return type;
     } else if (field.extraTypeInfo == "richtextarea") {
-      return `RichTextArea(${field.length})`;
+      return `Rich Text Area(${field.length})`;
     } else if (field.type == "string" || field.type == "textarea" || field.type == "url") {
       return `${translatedFieldTypes[field.type]}(${field.length})`;
     } else if (field.type == "double" || field.type == "currency" || field.type == "percent") {
