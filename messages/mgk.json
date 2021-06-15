@@ -5,7 +5,8 @@
       "flags": {
         "format":"the format of the export (xls, csv, sql, or md)",
         "path":"the destination filepath",
-        "sobject":"the named sobjects to be included in the export  - if ommitted, all custom and standard objects will be exported"
+        "sobject":"the named sobjects to be included in the export  - if ommitted, all custom and standard objects will be exported",
+        "customObjectsOnly":"limit the report to custom objects"
       }
     }
   }
