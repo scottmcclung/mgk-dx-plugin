@@ -185,6 +185,38 @@ const summaryHeaderMap = [
         style: {
             alignment: {vertical: 'top', horizontal: 'left', wrapText: true}
         }
+    },
+    {
+        fieldDataKey: "CreatedByName",
+        columnTitle: "Created By",
+        width: 25,
+        style: {
+            alignment: {vertical: 'top', horizontal: 'left', wrapText: true}
+        }
+    },
+    {
+        fieldDataKey: "CreatedDate",
+        columnTitle: "Created Date",
+        width: 30,
+        style: {
+            alignment: {vertical: 'top', horizontal: 'left', wrapText: true}
+        }
+    },
+    {
+        fieldDataKey: "LastModifiedByName",
+        columnTitle: "Last Modified By",
+        width: 25,
+        style: {
+            alignment: {vertical: 'top', horizontal: 'left', wrapText: true}
+        }
+    },
+    {
+        fieldDataKey: "LastModifiedDate",
+        columnTitle: "Last Modified Date",
+        width: 30,
+        style: {
+            alignment: {vertical: 'top', horizontal: 'left', wrapText: true}
+        }
     }
 ];
 

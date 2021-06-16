@@ -26,7 +26,7 @@ export class MetadataExport {
     protected async getSobjectMetadata(sobjectNames: any[]) {
         const sobjectFilter = sobjectNames.length > 0 ? `AND QualifiedApiName IN (${sobjectNames.map(name => `'${name}'`).join(',')})` : '';
         const strSoql = `
-            SELECT DurableId,DeveloperName,QualifiedApiName,KeyPrefix,Label,PluralLabel,ExternalSharingModel,InternalSharingModel,PublisherId,HelpSettingPageName,HelpSettingPageUrl
+            SELECT DurableId,DeveloperName,QualifiedApiName,KeyPrefix,Label,PluralLabel,ExternalSharingModel,InternalSharingModel,PublisherId,HelpSettingPageName,HelpSettingPageUrl,RecordTypesSupported,LastModifiedDate,LastModifiedBy.Name
             FROM EntityDefinition
             WHERE IsCustomizable = true
             AND PublisherId IN ('System','<local>')
@@ -48,26 +48,23 @@ export class MetadataExport {
                     InternalSharingModel: object.InternalSharingModel,
                     PublisherId: object.PublisherId,
                     HelpSettingPageName: object.HelpSettingPageName,
-                    HelpSettingPageUrl: object.HelpSettingPageUrl
+                    HelpSettingPageUrl: object.HelpSettingPageUrl,
+                    RecordTypesSupported: object.RecordTypesSupported.recordTypeInfos || [],
+                    LastModifiedDate: object.LastModifiedDate,
+                    LastModifiedByName: object.LastModifiedBy.Name
                 });
             }
         }
-
-        const metadata = await this._org.getConnection().metadata.list([{
+        const metadataList = await this._org.getConnection().metadata.list([{
             type: 'CustomObject'
         }], this._apiVersion);
-        if (metadata) {
-            for (const object of metadata) {
+        if (metadataList) {
+            for (const object of metadataList) {
                 if (!object.fullName || !this._sobjectMetadata.has(object.fullName)) continue;
                 this._sobjectMetadata.set(object.fullName, Object.assign(this._sobjectMetadata.get(object.fullName), {
-                    createdById: object.createdById,
-                    createdByName: object.createdByName,
-                    createdDate: object.createdDate,
-                    id: object.id,
-                    lastModifiedById: object.lastModifiedById,
-                    lastModifiedByName: object.lastModifiedByName,
-                    lastModifiedDate: object.lastModifiedDate,
-                    namespacePrefix: object.namespacePrefix || ''
+                    CreatedByName: object.createdByName,
+                    CreatedDate: object.createdDate,
+                    NamespacePrefix: object.namespacePrefix || ''
                 }));
             }
         }
