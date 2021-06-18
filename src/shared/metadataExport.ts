@@ -1,4 +1,4 @@
-import {Connection, Org} from '@salesforce/core';
+import {Org} from '@salesforce/core';
 import translatedFieldTypes from './fieldTypes';
 
 export class MetadataExport {
