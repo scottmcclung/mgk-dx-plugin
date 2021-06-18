@@ -1,39 +1,65 @@
-mgk-dx-plugin
-=======
-Description:
+# mgk-dx-plugin
+Plugin for the Salesforce CLI
 
-The Schema
+# Usage
+  <!-- usage -->
+```sh-session
+$ npm install -g schema
+$ sfdx COMMAND
+running command...
+$ sfdx (-v|--version|version)
+schema/0.0.0 darwin-x64 node-v12.16.1
+$ sfdx --help [COMMAND]
+USAGE
+  $ sfdx COMMAND
+...
+```
+<!-- usagestop -->
 
+# Commands
+  <!-- commands -->
+* [`sfdx mgk:schema:export -f xls|csv -p <filepath> [-s <array>] [--customobjectsonly] [-u <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`](#sfdx-mgkschemaexport--f-xlscsv--p-filepath--s-array---customobjectsonly--u-string---apiversion-string---json---loglevel-tracedebuginfowarnerrorfataltracedebuginfowarnerrorfatal)
 
-Example api usage:
-- Return schema for all objects
-  - sfdx mgk:schema:export --format xls --targetpath ./dir/example-filename.xls --targetusername myOrg@example.com 
-  - sfdx mgk:schema:export -f csv
-  - sfdx mgk:schema:export -f md
-  - sfdx mgk:schema:export -f sql   <- can be used to create similar tables in db or to import into draw.io for diagramming
-- Return schema for single named object
-  - sfdx mgk:schema:export --sobject Account --format xls --targetpath ./dir/example-filename.xls --targetusername myOrg@example.com
-  - sfdx mgk:schema:export -s Account -f csv
-  - sfdx mgk:schema:export -s Account -f md
-  - sfdx mgk:schema:export -s Account -f sql
-- Return schema for multiple named objects
-  - sfdx mgk:schema:export -sobject Account,Case,Opportuntiy -format xls --targetpath ./dir/example-filename.xls --targetusername myOrg@example.com
-  - sfdx mgk:schema:export -s Account,Case,Opportuntiy -f csv
-  - sfdx mgk:schema:export -s Account,Case,Opportuntiy -f md
-  - sfdx mgk:schema:export -s Account,Case,Opportuntiy -f sql
+## `sfdx mgk:schema:export -f xls|csv -p <filepath> [-s <array>] [--customobjectsonly] [-u <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`
 
+export sobject schema to various formats
 
+```
+export sobject schema to various formats
 
-Open questions:
-- when exporting to xls, it makes sense to include each object on a separate tab.  How should multiple objects be represented in csv?
-  - by including an object name column and just listing all the fields in order of object?
-  - by generating a unique file for each object?
-  - is this a user choice?
-  - does this mean that we add the format as a command segment to avoid the args explosion?  (this violates the style guide)
-    - mgk:schema:export:csv
-    - mgk:schema:export:xls
-    - mgk:schema:export:sql
-    - mgk:schema:export:md
-- should we include a global report that provides a summary of objects?  maybe details from describe global endpoint.
-  - org encoding
-  
+USAGE
+  $ sfdx mgk:schema:export -f xls|csv -p <filepath> [-s <array>] [--customobjectsonly] [-u <string>] [--apiversion 
+  <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]
+
+OPTIONS
+  -f, --format=(xls|csv)                                                            (required) the format of the export
+                                                                                    (xls, csv, sql, or md)
+
+  -p, --targetpath=targetpath                                                       (required) the destination filepath
+
+  -s, --sobjects=sobjects                                                           the named sobjects to be included in
+                                                                                    the export  - if ommitted, all
+                                                                                    custom and standard objects will be
+                                                                                    exported
+
+  -u, --targetusername=targetusername                                               username or alias for the target
+                                                                                    org; overrides default target org
+
+  --apiversion=apiversion                                                           override the api version used for
+                                                                                    api requests made by this command
+
+  --customobjectsonly                                                               limit the report to custom objects
+
+  --json                                                                            format output as json
+
+  --loglevel=(trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL)  [default: warn] logging level for
+                                                                                    this command invocation
+
+EXAMPLES
+  $ sfdx mgk:schema:export --format xls --targetpath ./dir/example-filename.xls --targetusername myOrg@example.com 
+  $ sfdx mgk:schema:export --sobject Account --format xls --targetpath ./dir/example-filename.xls --targetusername 
+  myOrg@example.com
+  $ sfdx mgk:schema:export -sobject Account,Case,Opportuntiy -format xls --targetpath ./dir/example-filename.xls 
+  --targetusername myOrg@example.com
+```
+<!-- commandsstop -->
