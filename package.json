@@ -1,8 +1,10 @@
 {
-  "name": "schema",
-  "version": "0.0.0",
-  "author": "Scott McClung",
-  "bugs": "https://github.com/tools/schema/issues",
+  "name": "mgk-dx-plugin",
+  "version": "0.0.1",
+  "author": "@scottmcclung",
+  "bugs": {
+    "url": "https://github.com/scottmcclung/mgk-dx-plugin/issues"
+  },
   "dependencies": {
     "@oclif/command": "^1",
     "@oclif/config": "^1",
@@ -20,6 +22,7 @@
     "@oclif/test": "^1",
     "@salesforce/dev-config": "1.4.1",
     "@types/chai": "^4",
+    "@types/jsforce": "^1.9.29",
     "@types/mocha": "^5",
     "@types/node": "^10",
     "chai": "^4",
@@ -38,7 +41,7 @@
     "/npm-shrinkwrap.json",
     "/oclif.manifest.json"
   ],
-  "homepage": "https://github.com/tools/schema",
+  "homepage": "https://github.com/scottmcclung/mgk-dx-plugin",
   "keywords": [
     "sfdx-plugin"
   ],
@@ -47,15 +50,18 @@
     "commands": "./lib/commands",
     "bin": "sfdx",
     "topics": {
-      "hello": {
-        "description": "Commands to say hello."
+      "mgk:schema": {
+        "description": "Commands to interact with the Salesforce sobject schema."
       }
     },
     "devPlugins": [
       "@oclif/plugin-help"
     ]
   },
-  "repository": "tools/schema",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/scottmcclung/mgk-dx-plugin.git"
+  },
   "scripts": {
     "lint": "tslint --project . --config tslint.json --format stylish",
     "postpack": "rm -f oclif.manifest.json",
@@ -63,5 +69,10 @@
     "prepack": "rm -rf lib && tsc -b && oclif-dev manifest && oclif-dev readme",
     "test": "nyc --extension .ts mocha --forbid-only \"test/**/*.test.ts\"",
     "version": "oclif-dev readme && git add README.md"
+  },
+  "description": "Plugin for the Salesforce CLI",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
   }
 }

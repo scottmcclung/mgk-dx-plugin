@@ -1,12 +1,12 @@
 import {flags, FlagsConfig, SfdxCommand} from '@salesforce/command';
 import {Messages} from '@salesforce/core';
 import {AnyJson} from '@salesforce/ts-types';
-import {MetadataExport} from '../../../shared/metadataExport';
+import MetadataExport from '../../../shared/metadataExport';
 import Report from "../../../shared/report";
 
 Messages.importMessagesDirectory(__dirname);
 
-const messages = Messages.loadMessages('schema', 'mgk');
+const messages = Messages.loadMessages('mgk-dx-plugin', 'mgk');
 
 export default class MgkSchemaExport extends SfdxCommand {
 
@@ -15,7 +15,7 @@ export default class MgkSchemaExport extends SfdxCommand {
     public static examples = [
         `$ sfdx mgk:schema:export --format xls --targetpath ./dir/example-filename.xls --targetusername myOrg@example.com `,
         `$ sfdx mgk:schema:export --sobject Account --format xls --targetpath ./dir/example-filename.xls --targetusername myOrg@example.com`,
-        `$ sfdx mgk:schema:export -sobject Account,Case,Opportuntiy -format xls --targetpath ./dir/example-filename.xls --targetusername myOrg@example.com`
+        `$ sfdx mgk:schema:export --sobject Account,Case,Opportuntiy --format xls --targetpath ./dir/example-filename.xls --targetusername myOrg@example.com`
     ];
 
     public static readonly flagsConfig: FlagsConfig = {
@@ -53,7 +53,11 @@ export default class MgkSchemaExport extends SfdxCommand {
         const customObjectsOnly = this.flags.customobjectsonly;
 
         const metadataExport = new MetadataExport({org, sobjects, customObjectsOnly});
-        const metadata = await metadataExport.getExport();
-        Report.write(format, targetPath, metadata);
+        const metadata: Map<string,object> = await metadataExport.getExport();
+        if(metadata.size > 0) {
+            Report.write(format, targetPath, metadata);
+        } else {
+            console.log('No results were found');
+        }
     }
 }

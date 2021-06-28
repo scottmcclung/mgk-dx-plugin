@@ -1,3 +1,27 @@
+const translatedFieldTypes = {
+    id: 'Id',
+    string: 'Text',
+    textarea: 'Text Area',
+    url: 'Url',
+    address: 'Address',
+    int: 'Number',
+    double: 'Number',
+    currency: 'Currency',
+    boolean: 'Checkbox',
+    percent: 'Percent',
+    picklist: 'Picklist',
+    multipicklist: 'Multi-Picklist',
+    combobox: 'Combobox',
+    reference: 'Lookup',
+    email: 'Email',
+    date: 'Date',
+    datetime: 'Datetime',
+    time: 'Time',
+    phone: 'Phone',
+    location: 'Location'
+};
+
+
 const headerMap = [
     {
         fieldDataKey: "object",
@@ -115,6 +139,14 @@ const headerMap = [
 
 const summaryHeaderMap = [
     {
+        fieldDataKey: "ObjectType",
+        columnTitle:  "Type",
+        width:        15,
+        style:        {
+            alignment: {vertical: 'top', horizontal: 'left', wrapText: true}
+        }
+    },
+    {
         fieldDataKey: "QualifiedApiName",
         columnTitle: "Qualified Api Name",
         width: 25,
@@ -163,14 +195,6 @@ const summaryHeaderMap = [
         }
     },
     {
-        fieldDataKey: "PublisherId",
-        columnTitle: "Publisher",
-        width: 15,
-        style: {
-            alignment: {vertical: 'top', horizontal: 'left', wrapText: true}
-        }
-    },
-    {
         fieldDataKey: "HelpSettingPageName",
         columnTitle: "Help Setting Page Name",
         width: 20,
@@ -183,6 +207,22 @@ const summaryHeaderMap = [
         columnTitle: "Help Setting Page Url",
         width: 25,
         style: {
+            alignment: {vertical: 'top', horizontal: 'left', wrapText: true}
+        }
+    },
+    {
+        fieldDataKey: "LastModifiedByName",
+        columnTitle:  "Last Modified By",
+        width:        25,
+        style:        {
+            alignment: {vertical: 'top', horizontal: 'left', wrapText: true}
+        }
+    },
+    {
+        fieldDataKey: "LastModifiedDate",
+        columnTitle:  "Last Modified Date",
+        width:        30,
+        style:        {
             alignment: {vertical: 'top', horizontal: 'left', wrapText: true}
         }
     },
@@ -203,21 +243,13 @@ const summaryHeaderMap = [
         }
     },
     {
-        fieldDataKey: "LastModifiedByName",
-        columnTitle: "Last Modified By",
-        width: 25,
-        style: {
-            alignment: {vertical: 'top', horizontal: 'left', wrapText: true}
-        }
-    },
-    {
-        fieldDataKey: "LastModifiedDate",
-        columnTitle: "Last Modified Date",
-        width: 30,
-        style: {
+        fieldDataKey: "Publisher",
+        columnTitle:  "Publisher",
+        width:        15,
+        style:        {
             alignment: {vertical: 'top', horizontal: 'left', wrapText: true}
         }
     }
 ];
 
-export {headerMap, summaryHeaderMap};
+export {headerMap, summaryHeaderMap, translatedFieldTypes};

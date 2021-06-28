@@ -1,7 +1,9 @@
 import {Org} from '@salesforce/core';
-import translatedFieldTypes from './fieldTypes';
+import {translatedFieldTypes} from './exportSettings';
+import {Field, FileProperties, QueryResult} from "jsforce";
+import {DescribeSObjectResult, PicklistEntry} from "jsforce/describe-result";
 
-export class MetadataExport {
+export default class MetadataExport {
     protected _apiVersion: string;
     protected _org: Org;
     protected _sobjects: string[];
@@ -18,69 +20,75 @@ export class MetadataExport {
 
     public async getExport() {
         this._sobjectMetadata = new Map();
-        await this.getSobjectMetadata(this._sobjects);
-        await this.getDescribeMetadata(Array.from(this._sobjectMetadata.keys()));
+        await this.loadEntityDefinitions(this._sobjects);
+        if (this._sobjectMetadata.size > 0) {
+            await this.loadCustomObjectMetadata();
+            await this.getDescribeMetadata(Array.from(this._sobjectMetadata.keys()));
+        }
         return this._sobjectMetadata;
     }
 
-    protected async getSobjectMetadata(sobjectNames: any[]) {
+    protected async loadEntityDefinitions(sobjectNames: string[]) {
         const sobjectFilter = sobjectNames.length > 0 ? `AND QualifiedApiName IN (${sobjectNames.map(name => `'${name}'`).join(',')})` : '';
         const strSoql = `
             SELECT DurableId,DeveloperName,QualifiedApiName,KeyPrefix,Label,PluralLabel,ExternalSharingModel,InternalSharingModel,PublisherId,HelpSettingPageName,HelpSettingPageUrl,RecordTypesSupported,LastModifiedDate,LastModifiedBy.Name
             FROM EntityDefinition
             WHERE IsCustomizable = true
-            AND PublisherId IN ('System','<local>')
             ${sobjectFilter}
             ORDER BY QualifiedApiName ASC
             `;
-        const entities = await this._org.getConnection().query(strSoql);
+        const entities: QueryResult<T> = await this._org.getConnection().query(strSoql);
         if (entities.records) {
             for (const object of entities.records) {
                 if (this._customObjectsOnly && !object.QualifiedApiName.endsWith('__c')) continue;
                 this._sobjectMetadata.set(object.QualifiedApiName, {
-                    DurableId: object.DurableId,
-                    DeveloperName: object.DeveloperName,
-                    QualifiedApiName: object.QualifiedApiName,
-                    KeyPrefix: object.KeyPrefix,
-                    Label: object.Label,
-                    PluralLabel: object.PluralLabel,
+                    DurableId:            object.DurableId,
+                    DeveloperName:        object.DeveloperName,
+                    QualifiedApiName:     object.QualifiedApiName,
+                    KeyPrefix:            object.KeyPrefix,
+                    Label:                object.Label,
+                    PluralLabel:          object.PluralLabel,
                     ExternalSharingModel: object.ExternalSharingModel,
                     InternalSharingModel: object.InternalSharingModel,
-                    PublisherId: object.PublisherId,
-                    HelpSettingPageName: object.HelpSettingPageName,
-                    HelpSettingPageUrl: object.HelpSettingPageUrl,
+                    HelpSettingPageName:  object.HelpSettingPageName,
+                    HelpSettingPageUrl:   object.HelpSettingPageUrl,
                     RecordTypesSupported: object.RecordTypesSupported.recordTypeInfos || [],
-                    LastModifiedDate: object.LastModifiedDate,
-                    LastModifiedByName: object.LastModifiedBy.Name
+                    ObjectType:           this.getObjectType(object)
                 });
-            }
-        }
-        const metadataList = await this._org.getConnection().metadata.list([{
-            type: 'CustomObject'
-        }], this._apiVersion);
-        if (metadataList) {
-            for (const object of metadataList) {
-                if (!object.fullName || !this._sobjectMetadata.has(object.fullName)) continue;
-                this._sobjectMetadata.set(object.fullName, Object.assign(this._sobjectMetadata.get(object.fullName), {
-                    CreatedByName: object.createdByName,
-                    CreatedDate: object.createdDate,
-                    NamespacePrefix: object.namespacePrefix || ''
-                }));
             }
         }
     }
 
+
+    protected async loadCustomObjectMetadata() {
+        const metadataList: FileProperties[] = await this._org.getConnection().metadata.list([{
+            type: 'CustomObject'
+        }], this._apiVersion);
+        if (metadataList) {
+            for (const object: FileProperties of metadataList) {
+                if (!object.fullName || !this._sobjectMetadata.has(object.fullName)) continue;
+                this._sobjectMetadata.set(object.fullName, Object.assign(this._sobjectMetadata.get(object.fullName), {
+                    LastModifiedByName: object.lastModifiedByName,
+                    LastModifiedDate:   object.lastModifiedDate,
+                    CreatedByName:      object.createdByName,
+                    CreatedDate:        object.createdDate,
+                    Publisher:          object.namespacePrefix || ''
+                }));
+            }
+        }
+    }
 
     /**
      * Returns an array of metadata with the fields already normalized
      * @param sobjectNames
      * @protected
      */
-    protected async getDescribeMetadata(sobjectNames: string[]): any[] {
-        const metadata = await this._org.getConnection().batchDescribe({
-            types: sobjectNames
+    protected async getDescribeMetadata(sobjectNames: string[]): Promise<T> {
+        const metadata: DescribeSObjectResult[] = await this._org.getConnection().batchDescribe({
+            types:     sobjectNames,
+            autofetch: true
         });
-        for (const object of metadata) {
+        for (const object: DescribeSObjectResult of metadata) {
             if (!this._sobjectMetadata.has(object.name)) continue;
 
             const fieldMap = new Map();
@@ -95,7 +103,7 @@ export class MetadataExport {
             }
 
             const objectDefinition = Object.assign(this._sobjectMetadata.get(object.name), {
-                fields: fieldMap,
+                fields:             fieldMap,
                 childRelationships: object.childRelationships
             });
 
@@ -103,10 +111,10 @@ export class MetadataExport {
         }
     }
 
-    protected getFieldDescribeMap(fields: any[], objectName: string) {
+    protected getFieldDescribeMap(fields: Field[], objectName: string) {
         const fieldDescribeMap = new Map();
         if (!fields) return fieldDescribeMap;
-        for (const field of fields) {
+        for (const field: Field of fields) {
             fieldDescribeMap.set(field.name, this.normalizeFieldMetadata(field, objectName));
         }
         return fieldDescribeMap;
@@ -121,12 +129,12 @@ export class MetadataExport {
           FROM FieldDefinition
           WHERE EntityDefinition.QualifiedApiName = '${objectName}'
           `;
-        const fieldDefinitions = await this._org.getConnection().tooling.query(fieldDefinitionSoql);
+        const fieldDefinitions: QueryResult<T> = await this._org.getConnection().tooling.query(fieldDefinitionSoql);
         if (fieldDefinitions) {
             fieldDefinitions.records.forEach(field => {
                 fieldDefinitionMap.set(field.QualifiedApiName, {
-                    object: objectName,
-                    durableId: field.DurableId,
+                    object:      objectName,
+                    durableId:   field.DurableId,
                     description: field.Description,
                     publisherId: field.PublisherId
                 });
@@ -135,27 +143,27 @@ export class MetadataExport {
         return fieldDefinitionMap;
     }
 
-    protected normalizeFieldMetadata(field: object, objectName: string) {
+    protected normalizeFieldMetadata(field: Field, objectName: string) {
         return {
-            apiName: field.name,
-            label: field.label,
-            helpText: field.inlineHelpText,
-            dataType: this.formattedDataType(field),
-            required: field.nillable ? 'No' : 'Yes',
-            unique: field.unique ? 'Yes' : 'No',
-            externalId: field.externalkey ? 'Yes' : 'No',
+            apiName:       field.name,
+            label:         field.label,
+            helpText:      field.inlineHelpText,
+            dataType:      this.formattedDataType(field),
+            required:      field.nillable ? 'No' : 'Yes',
+            unique:        field.unique ? 'Yes' : 'No',
+            externalId:    field.externalkey ? 'Yes' : 'No',
             caseSensitive: field.caseSensitive ? 'Yes' : 'No',
-            formula: field.calculatedFormula,
-            defaultValue: this.formattedDefaultValue(field),
-            encrypted: field.encrypted ? 'Yes' : 'No',
-            object: objectName,
-            durableId: null,
-            description: null,
-            publisherId: 'System'
+            formula:       field.calculatedFormula,
+            defaultValue:  this.formattedDefaultValue(field),
+            encrypted:     field.encrypted ? 'Yes' : 'No',
+            object:        objectName,
+            durableId:     null,
+            description:   null,
+            publisherId:   'System'
         };
     }
 
-    protected formattedDataType(field): string {
+    protected formattedDataType(field: Field): string {
         if (field.type == "reference") {
             return `${translatedFieldTypes[field.type]}(${field.referenceTo.join(",")})`;
         } else if (field.calculated) {
@@ -180,14 +188,33 @@ export class MetadataExport {
         }
     }
 
-    protected formattedDefaultValue(field): string {
+    protected formattedDefaultValue(field: Field): string {
         if (field.calculatedFormula) {
             return `Formula(${field.calculatedFormula})`;
         }
         return field.defaultValue;
     }
 
-    protected formattedPicklistValues(values: any[]): any[] {
+    protected formattedPicklistValues(values: PicklistEntry[]): string {
         return values.map(value => value.label).join(", ");
+    }
+
+    protected getObjectType(sobject) {
+        const name: string = sobject.QualifiedApiName;
+        if (name.endsWith('__c')) return 'Custom';
+        if (name.endsWith('__e')) return 'Platform Event';
+        if (name.endsWith('__mdt')) return 'Custom Metadata Type';
+        if (name.endsWith('__xo')) return 'Salesforce-to-Salesforce';
+        if (name.endsWith('__x')) return 'External';
+        if (name.endsWith('__Share')) return 'Custom Object Sharing Object';
+        if (name.endsWith('__Tag')) return 'Salesforce Tags';
+        if (name.endsWith('__History')) return 'Custom Object Field History';
+        if (name.endsWith('__hd')) return 'Historical Data';
+        if (name.endsWith('__b')) return 'Big Object';
+        if (name.endsWith('__p')) return 'Custom Person Object';
+        if (name.endsWith('__ChangeEvent')) return 'Change Data Capture';
+        if (name.endsWith('__chn')) return 'Change Event Channel';
+        if (name.endsWith('__Feed')) return 'Custom Object Feed';
+        return 'Standard';
     }
 }
