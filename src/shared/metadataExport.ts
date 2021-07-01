@@ -37,7 +37,7 @@ export default class MetadataExport {
             ${sobjectFilter}
             ORDER BY QualifiedApiName ASC
             `;
-        const entities: QueryResult<T> = await this._org.getConnection().query(strSoql);
+        const entities: QueryResult<any> = await this._org.getConnection().query(strSoql);
         if (entities.records) {
             for (const object of entities.records) {
                 if (this._customObjectsOnly && !object.QualifiedApiName.endsWith('__c')) continue;
@@ -65,7 +65,7 @@ export default class MetadataExport {
             type: 'CustomObject'
         }], this._apiVersion);
         if (metadataList) {
-            for (const object: FileProperties of metadataList) {
+            for (const object of metadataList) {
                 if (!object.fullName || !this._sobjectMetadata.has(object.fullName)) continue;
                 this._sobjectMetadata.set(object.fullName, Object.assign(this._sobjectMetadata.get(object.fullName), {
                     LastModifiedByName: object.lastModifiedByName,
@@ -83,12 +83,12 @@ export default class MetadataExport {
      * @param sobjectNames
      * @protected
      */
-    protected async getDescribeMetadata(sobjectNames: string[]): Promise<T> {
+    protected async getDescribeMetadata(sobjectNames: string[]): Promise<any> {
         const metadata: DescribeSObjectResult[] = await this._org.getConnection().batchDescribe({
             types:     sobjectNames,
             autofetch: true
         });
-        for (const object: DescribeSObjectResult of metadata) {
+        for (const object of metadata) {
             if (!this._sobjectMetadata.has(object.name)) continue;
 
             const fieldMap = new Map();
@@ -114,7 +114,7 @@ export default class MetadataExport {
     protected getFieldDescribeMap(fields: Field[], objectName: string) {
         const fieldDescribeMap = new Map();
         if (!fields) return fieldDescribeMap;
-        for (const field: Field of fields) {
+        for (const field of fields) {
             fieldDescribeMap.set(field.name, this.normalizeFieldMetadata(field, objectName));
         }
         return fieldDescribeMap;
@@ -129,7 +129,7 @@ export default class MetadataExport {
           FROM FieldDefinition
           WHERE EntityDefinition.QualifiedApiName = '${objectName}'
           `;
-        const fieldDefinitions: QueryResult<T> = await this._org.getConnection().tooling.query(fieldDefinitionSoql);
+        const fieldDefinitions: QueryResult<any> = await this._org.getConnection().tooling.query(fieldDefinitionSoql);
         if (fieldDefinitions) {
             fieldDefinitions.records.forEach(field => {
                 fieldDefinitionMap.set(field.QualifiedApiName, {
@@ -151,7 +151,7 @@ export default class MetadataExport {
             dataType:      this.formattedDataType(field),
             required:      field.nillable ? 'No' : 'Yes',
             unique:        field.unique ? 'Yes' : 'No',
-            externalId:    field.externalkey ? 'Yes' : 'No',
+            externalId:    field.externalId ? 'Yes' : 'No',
             caseSensitive: field.caseSensitive ? 'Yes' : 'No',
             formula:       field.calculatedFormula,
             defaultValue:  this.formattedDefaultValue(field),
@@ -189,10 +189,12 @@ export default class MetadataExport {
     }
 
     protected formattedDefaultValue(field: Field): string {
-        if (field.calculatedFormula) {
-            return `Formula(${field.calculatedFormula})`;
+        console.log(field);
+        if (field.defaultValueFormula) {
+            return `Formula(${field.defaultValueFormula})`;
         }
-        return field.defaultValue;
+        if(field.defaultValue === null) return '';
+        return field.defaultValue.toString();
     }
 
     protected formattedPicklistValues(values: PicklistEntry[]): string {

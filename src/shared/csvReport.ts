@@ -11,13 +11,13 @@ const headers = () => {
 }
 
 export default class CsvReport {
-    public static async write(filePath: string, metadata: Map<string, object>) {
+    public static async write(filePath: string, metadata) {
         const csvWriter = createCsvWriter({
             path: `${filePath}.csv`,
             header: headers()
         });
 
-        for (const [key, sobject] of metadata.entries()) {
+        for (const sobject of metadata.values()) {
             await csvWriter.writeRecords(Array.from(sobject.fields.values()));
         }
     }

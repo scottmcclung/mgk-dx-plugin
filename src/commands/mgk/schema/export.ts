@@ -1,6 +1,5 @@
 import {flags, FlagsConfig, SfdxCommand} from '@salesforce/command';
 import {Messages} from '@salesforce/core';
-import {AnyJson} from '@salesforce/ts-types';
 import MetadataExport from '../../../shared/metadataExport';
 import Report from "../../../shared/report";
 
@@ -46,7 +45,7 @@ export default class MgkSchemaExport extends SfdxCommand {
 
     protected static requiresUsername = true;
 
-    public async run(): Promise<AnyJson> {
+    public async run() {
         const org = this.org;
         const format = this.flags.format;
         const sobjects = this.flags.sobjects;

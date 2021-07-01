@@ -38,12 +38,12 @@ const getWorksheet = (workbook: Workbook, name: string, headers: object[]) => {
 
 const generateObjectSummaryWorksheet = (workbook: Workbook, metadata: Map<string, object>) => {
     const worksheet = getWorksheet(workbook, 'SObject', sobjectHeaders());
-    for (const [key, sobject] of metadata.entries()) {
+    for (const sobject of metadata.values()) {
         worksheet.addRow({...sobject});
     }
 };
 
-const generateObjectWorksheets = (workbook: Workbook, worksheetName: string, worksheetData: object) => {
+const generateObjectWorksheets = (workbook: Workbook, worksheetName: string, worksheetData) => {
     if (worksheetData.fields) {
         const worksheet = getWorksheet(workbook, worksheetName, headers());
         for (const field of worksheetData.fields.values()) {
