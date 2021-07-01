@@ -189,7 +189,6 @@ export default class MetadataExport {
     }
 
     protected formattedDefaultValue(field: Field): string {
-        console.log(field);
         if (field.defaultValueFormula) {
             return `Formula(${field.defaultValueFormula})`;
         }
