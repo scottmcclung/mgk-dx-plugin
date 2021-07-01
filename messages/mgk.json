@@ -1,11 +1,11 @@
 {
   "schema": {
     "export": {
-      "description": "export sobject schema to various formats",
+      "description": "Exports sobject schema to various formats",
       "flags": {
-        "format":"the format of the export (xls, csv, sql, or md)",
+        "format":"the format of the export (xls, csv)",
         "path":"the destination filepath",
-        "sobject":"the named sobjects to be included in the export  - if ommitted, all custom and standard objects will be exported",
+        "sobject":"the named sobjects to be included in the export - default is all custom and standard objects are exported",
         "customObjectsOnly":"limit the report to custom objects"
       }
     }

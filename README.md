@@ -1,31 +1,27 @@
 # mgk-dx-plugin
 Plugin for the Salesforce CLI
 
-# Usage
-  <!-- usage -->
-```sh-session
-$ npm install -g schema
-$ sfdx COMMAND
-running command...
-$ sfdx (-v|--version|version)
-schema/0.0.0 darwin-x64 node-v12.16.1
-$ sfdx --help [COMMAND]
-USAGE
-  $ sfdx COMMAND
-...
-```
-<!-- usagestop -->
+## Installation into the Salesforce CLI
 
-# Commands
+Install the plugin into your Salesforce CLI using this command:
+
+```sh-session
+$ sfdx plugins:install @scottmcclung/mgk-dx-plugin
+```
+
+You can check a successful installation with `sfdx plugins`. Updates are applied when executing `sfdx plugins:update`.
+
+
+## Commands
   <!-- commands -->
 * [`sfdx mgk:schema:export -f xls|csv -p <filepath> [-s <array>] [--customobjectsonly] [-u <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`](#sfdx-mgkschemaexport--f-xlscsv--p-filepath--s-array---customobjectsonly--u-string---apiversion-string---json---loglevel-tracedebuginfowarnerrorfataltracedebuginfowarnerrorfatal)
 
 ## `sfdx mgk:schema:export -f xls|csv -p <filepath> [-s <array>] [--customobjectsonly] [-u <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`
 
-export sobject schema to various formats
+Exports sobject schema to various formats
 
 ```
-export sobject schema to various formats
+Exports sobject schema to various formats
 
 USAGE
   $ sfdx mgk:schema:export -f xls|csv -p <filepath> [-s <array>] [--customobjectsonly] [-u <string>] [--apiversion 
@@ -33,14 +29,13 @@ USAGE
 
 OPTIONS
   -f, --format=(xls|csv)                                                            (required) the format of the export
-                                                                                    (xls, csv, sql, or md)
+                                                                                    (xls, csv)
 
   -p, --targetpath=targetpath                                                       (required) the destination filepath
 
   -s, --sobjects=sobjects                                                           the named sobjects to be included in
-                                                                                    the export  - if ommitted, all
-                                                                                    custom and standard objects will be
-                                                                                    exported
+                                                                                    the export - default is all custom
+                                                                                    and standard objects are exported
 
   -u, --targetusername=targetusername                                               username or alias for the target
                                                                                     org; overrides default target org
@@ -57,9 +52,11 @@ OPTIONS
 
 EXAMPLES
   $ sfdx mgk:schema:export --format xls --targetpath ./dir/example-filename.xls --targetusername myOrg@example.com 
+  $ sfdx mgk:schema:export --format xls --targetpath ./dir/example-filename.xls --customobjectsonly --targetusername 
+  myOrg@example.com 
   $ sfdx mgk:schema:export --sobject Account --format xls --targetpath ./dir/example-filename.xls --targetusername 
   myOrg@example.com
-  $ sfdx mgk:schema:export -sobject Account,Case,Opportuntiy -format xls --targetpath ./dir/example-filename.xls 
-  --targetusername myOrg@example.com
+  $ sfdx mgk:schema:export --sobject Account,Case,Opportunity,MyCustomObject__c --format xls --targetpath 
+  ./dir/example-filename.xls --targetusername myOrg@example.com
 ```
 <!-- commandsstop -->

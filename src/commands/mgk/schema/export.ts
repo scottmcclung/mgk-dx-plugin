@@ -14,8 +14,9 @@ export default class MgkSchemaExport extends SfdxCommand {
 
     public static examples = [
         `$ sfdx mgk:schema:export --format xls --targetpath ./dir/example-filename.xls --targetusername myOrg@example.com `,
+        `$ sfdx mgk:schema:export --format xls --targetpath ./dir/example-filename.xls --customobjectsonly --targetusername myOrg@example.com `,
         `$ sfdx mgk:schema:export --sobject Account --format xls --targetpath ./dir/example-filename.xls --targetusername myOrg@example.com`,
-        `$ sfdx mgk:schema:export --sobject Account,Case,Opportuntiy --format xls --targetpath ./dir/example-filename.xls --targetusername myOrg@example.com`
+        `$ sfdx mgk:schema:export --sobject Account,Case,Opportunity,MyCustomObject__c --format xls --targetpath ./dir/example-filename.xls --targetusername myOrg@example.com`
     ];
 
     public static readonly flagsConfig: FlagsConfig = {
