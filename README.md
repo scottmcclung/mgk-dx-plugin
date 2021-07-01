@@ -6,7 +6,7 @@ Plugin for the Salesforce CLI
 Install the plugin into your Salesforce CLI using this command:
 
 ```sh-session
-$ sfdx plugins:install @scottmcclung/mgk-dx-plugin
+$ sfdx plugins:install mgk-dx-plugin
 ```
 
 You can check a successful installation with `sfdx plugins`. Updates are applied when executing `sfdx plugins:update`.
@@ -59,4 +59,6 @@ EXAMPLES
   $ sfdx mgk:schema:export --sobject Account,Case,Opportunity,MyCustomObject__c --format xls --targetpath 
   ./dir/example-filename.xls --targetusername myOrg@example.com
 ```
+
+_See code: [lib/commands/mgk/schema/export.js](https://github.com/scottmcclung/mgk-dx-plugin/blob/v1.0.0/lib/commands/mgk/schema/export.js)_
 <!-- commandsstop -->

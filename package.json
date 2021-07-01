@@ -1,78 +1,77 @@
 {
-  "name": "mgk-dx-plugin",
-  "version": "1.0.0",
-  "author": "@scottmcclung",
-  "bugs": {
-    "url": "https://github.com/scottmcclung/mgk-dx-plugin/issues"
-  },
-  "dependencies": {
-    "@oclif/command": "^1",
-    "@oclif/config": "^1",
-    "@oclif/errors": "^1",
-    "@salesforce/command": "^3.1.0",
-    "@salesforce/core": "^2.23.0",
-    "@salesforce/ts-types": "^1.5.13",
-    "csv-writer": "^1.6.0",
-    "exceljs": "^4.2.1",
-    "tslib": "^1"
-  },
-  "devDependencies": {
-    "@oclif/dev-cli": "^1",
-    "@oclif/plugin-help": "^2",
-    "@oclif/test": "^1",
-    "@salesforce/dev-config": "1.4.1",
-    "@types/chai": "^4",
-    "@types/jsforce": "^1.9.29",
-    "@types/mocha": "^5",
-    "@types/node": "^10",
-    "chai": "^4",
-    "globby": "^8",
-    "mocha": "^5",
-    "nyc": "^14",
-    "ts-node": "^8",
-    "tslint": "^5"
-  },
-  "engines": {
-    "node": ">=8.0.0"
-  },
-  "files": [
-    "/lib",
-    "/messages",
-    "/npm-shrinkwrap.json",
-    "/oclif.manifest.json"
-  ],
-  "homepage": "https://github.com/scottmcclung/mgk-dx-plugin",
-  "keywords": [
-    "sfdx-plugin"
-  ],
-  "license": "MIT",
-  "oclif": {
-    "commands": "./lib/commands",
-    "bin": "sfdx",
-    "topics": {
-      "mgk:schema": {
-        "description": "Commands to interact with the Salesforce sobject schema."
-      }
+    "name": "mgk-dx-plugin",
+    "version": "1.0.0",
+    "author": "@scottmcclung",
+    "bugs": {
+        "url": "https://github.com/scottmcclung/mgk-dx-plugin/issues"
     },
-    "devPlugins": [
-      "@oclif/plugin-help"
-    ]
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/scottmcclung/mgk-dx-plugin.git"
-  },
-  "scripts": {
-    "lint": "tslint --project . --config tslint.json --format stylish",
-    "postpack": "rm -f oclif.manifest.json",
-    "posttest": "tslint -p test -t stylish",
-    "prepack": "rm -rf lib && tsc -b && oclif-dev manifest && oclif-dev readme",
-    "test": "nyc --extension .ts mocha --forbid-only \"test/**/*.test.ts\"",
-    "version": "oclif-dev readme && git add README.md"
-  },
-  "description": "Plugin for the Salesforce CLI",
-  "main": "index.js",
-  "directories": {
-    "test": "test"
-  }
+    "dependencies": {
+        "@oclif/command": "^1",
+        "@oclif/config": "^1",
+        "@oclif/errors": "^1",
+        "@salesforce/command": "^3.1.0",
+        "@salesforce/core": "^2.23.0",
+        "@salesforce/ts-types": "^1.5.13",
+        "csv-writer": "^1.6.0",
+        "exceljs": "^4.2.1",
+        "tslib": "^1"
+    },
+    "devDependencies": {
+        "@oclif/dev-cli": "^1",
+        "@oclif/plugin-help": "^2",
+        "@oclif/test": "^1",
+        "@salesforce/dev-config": "1.4.1",
+        "@types/chai": "^4",
+        "@types/jsforce": "^1.9.30",
+        "@types/mocha": "^5",
+        "chai": "^4",
+        "globby": "^8",
+        "mocha": "^5",
+        "nyc": "^14",
+        "ts-node": "^8",
+        "tslint": "^5"
+    },
+    "engines": {
+        "node": ">=8.0.0"
+    },
+    "files": [
+        "/lib",
+        "/messages",
+        "/npm-shrinkwrap.json",
+        "/oclif.manifest.json"
+    ],
+    "homepage": "https://github.com/scottmcclung/mgk-dx-plugin",
+    "keywords": [
+        "sfdx-plugin"
+    ],
+    "license": "MIT",
+    "oclif": {
+        "commands": "./lib/commands",
+        "bin": "sfdx",
+        "topics": {
+            "mgk:schema": {
+                "description": "Commands to interact with the Salesforce sobject schema."
+            }
+        },
+        "devPlugins": [
+            "@oclif/plugin-help"
+        ]
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/scottmcclung/mgk-dx-plugin.git"
+    },
+    "scripts": {
+        "lint": "tslint --project . --config tslint.json --format stylish",
+        "postpack": "rm -f oclif.manifest.json",
+        "posttest": "tslint -p test -t stylish",
+        "prepack": "tsc -b && oclif-dev manifest && oclif-dev readme",
+        "test": "nyc --extension .ts mocha --forbid-only \"test/**/*.test.ts\"",
+        "version": "oclif-dev readme && git add README.md"
+    },
+    "description": "Plugin for the Salesforce CLI",
+    "main": "index.js",
+    "directories": {
+        "test": "test"
+    }
 }
