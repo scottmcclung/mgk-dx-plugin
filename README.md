@@ -1,6 +1,17 @@
 # mgk-dx-plugin
 Plugin for the Salesforce CLI
 
+## Features
+
+### Schema Export
+Extracts org metadata to provide a list of objects and fields in a convenient Excel report. (Field attributes include the **Description** field!)
+
+The default behavior is to extract all standard and custom objects.  This will also include the schema for things like External Objects, Platform Events, or Custom Metadata Types.
+
+- Use the `--customobjectsonly` flag to limit the output to just custom objects.
+- Use the `-s` flag to limit the output to a specific list of objects.  `-s Account,Contact,MyCustomObject__c,MyPlatformEvent__e`
+
+
 ## Installation into the Salesforce CLI
 
 Install the plugin into your Salesforce CLI using this command:
@@ -10,6 +21,11 @@ $ sfdx plugins:install mgk-dx-plugin
 ```
 
 You can check a successful installation with `sfdx plugins`. Updates are applied when executing `sfdx plugins:update`.
+
+## Salesforce CLI References
+More information about the Salesforce CLI can be found at [https://developer.salesforce.com/tools/sfdxcli](https://developer.salesforce.com/tools/sfdxcli)
+<br>
+An admin focused Salesforce CLI tutorial [https://www.youtube.com/watch?v=VMU8xbmqmQ4](https://www.youtube.com/watch?v=VMU8xbmqmQ4) 
 
 
 ## Commands
@@ -60,5 +76,5 @@ EXAMPLES
   ./dir/example-filename.xls --targetusername myOrg@example.com
 ```
 
-_See code: [lib/commands/mgk/schema/export.js](https://github.com/scottmcclung/mgk-dx-plugin/blob/v1.0.0/lib/commands/mgk/schema/export.js)_
+_See code: [lib/commands/mgk/schema/export.js](https://github.com/scottmcclung/mgk-dx-plugin/blob/v1.0.1/lib/commands/mgk/schema/export.js)_
 <!-- commandsstop -->
