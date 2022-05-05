@@ -26,10 +26,7 @@ const sobjectHeaders = () => {
 const getWorksheet = (workbook: Workbook, name: string, headers: object[]) => {
     const worksheet = workbook.addWorksheet(name);
     worksheet.columns = headers;
-    worksheet.autoFilter = {
-        from: 'A1',
-        to:   'R1',
-    };
+
     worksheet.views = [
         {state: 'frozen', ySplit: 1}
     ];
@@ -38,6 +35,10 @@ const getWorksheet = (workbook: Workbook, name: string, headers: object[]) => {
 
 const generateObjectSummaryWorksheet = (workbook: Workbook, metadata: Map<string, object>) => {
     const worksheet = getWorksheet(workbook, 'SObject', sobjectHeaders());
+    worksheet.autoFilter = {
+        from: 'A1',
+        to:   'N1'
+    };
     for (const sobject of metadata.values()) {
         worksheet.addRow({...sobject});
     }
@@ -46,6 +47,10 @@ const generateObjectSummaryWorksheet = (workbook: Workbook, metadata: Map<string
 const generateObjectWorksheets = (workbook: Workbook, worksheetName: string, worksheetData) => {
     if (worksheetData.fields) {
         const worksheet = getWorksheet(workbook, worksheetName, headers());
+        worksheet.autoFilter = {
+            from: 'A1',
+            to:   'S1'
+        };
         for (const field of worksheetData.fields.values()) {
             worksheet.addRow({...field});
         }

@@ -125,7 +125,7 @@ export default class MetadataExport {
         if (!objectName) return fieldDefinitionMap;
 
         const fieldDefinitionSoql = `
-          SELECT Id,BusinessOwnerId,BusinessStatus,ComplianceGroup,DurableId,Description,QualifiedApiName,PublisherId,SecurityClassification
+          SELECT Id,BusinessOwner.Name,BusinessStatus,ComplianceGroup,DurableId,Description,QualifiedApiName,PublisherId,RelationshipName,SecurityClassification
           FROM FieldDefinition
           WHERE EntityDefinition.QualifiedApiName = '${objectName}'
           `;
@@ -137,10 +137,11 @@ export default class MetadataExport {
                     durableId:   field.DurableId,
                     description: field.Description,
                     publisherId: field.PublisherId,
-                    dataOwner: field.BusinessOwnerId,
+                    dataOwner: field.BusinessOwner ? field.BusinessOwner.Name : "",
                     fieldUsage: field.BusinessStatus,
                     dataSensitivityLevel: field.SecurityClassification,
-                    complianceCategorization: field.ComplianceGroup
+                    complianceCategorization: field.ComplianceGroup,
+                    relationshipName: field.RelationshipName
                 });
             });
         }

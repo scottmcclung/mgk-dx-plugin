@@ -138,7 +138,7 @@ const headerMap = [
     {
         fieldDataKey: "fieldUsage",
         columnTitle: "Field Usage",
-        width: 10,
+        width: 12,
         style: {
             alignment: {vertical: 'top', horizontal: 'left', wrapText: true}
         }
@@ -146,7 +146,7 @@ const headerMap = [
     {
         fieldDataKey: "dataSensitivityLevel",
         columnTitle: "Data Sensitivity Level",
-        width: 10,
+        width: 15,
         style: {
             alignment: {vertical: 'top', horizontal: 'left', wrapText: true}
         }
@@ -154,7 +154,15 @@ const headerMap = [
     {
         fieldDataKey: "complianceCategorization",
         columnTitle: "Compliance Categorization",
-        width: 10,
+        width: 12,
+        style: {
+            alignment: {vertical: 'top', horizontal: 'left', wrapText: true}
+        }
+    },
+    {
+        fieldDataKey: "relationshipName",
+        columnTitle: "Relationship Name",
+        width: 12,
         style: {
             alignment: {vertical: 'top', horizontal: 'left', wrapText: true}
         }
