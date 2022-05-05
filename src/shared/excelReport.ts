@@ -28,7 +28,7 @@ const getWorksheet = (workbook: Workbook, name: string, headers: object[]) => {
     worksheet.columns = headers;
     worksheet.autoFilter = {
         from: 'A1',
-        to:   'I1',
+        to:   'R1',
     };
     worksheet.views = [
         {state: 'frozen', ySplit: 1}
