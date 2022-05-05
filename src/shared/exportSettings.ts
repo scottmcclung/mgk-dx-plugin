@@ -128,6 +128,46 @@ const headerMap = [
         }
     },
     {
+        fieldDataKey: "dataOwner",
+        columnTitle: "Data Owner",
+        width: 18,
+        style: {
+            alignment: {vertical: 'top', horizontal: 'left', wrapText: true}
+        }
+    },
+    {
+        fieldDataKey: "fieldUsage",
+        columnTitle: "Field Usage",
+        width: 12,
+        style: {
+            alignment: {vertical: 'top', horizontal: 'left', wrapText: true}
+        }
+    },
+    {
+        fieldDataKey: "dataSensitivityLevel",
+        columnTitle: "Data Sensitivity Level",
+        width: 15,
+        style: {
+            alignment: {vertical: 'top', horizontal: 'left', wrapText: true}
+        }
+    },
+    {
+        fieldDataKey: "complianceCategorization",
+        columnTitle: "Compliance Categorization",
+        width: 12,
+        style: {
+            alignment: {vertical: 'top', horizontal: 'left', wrapText: true}
+        }
+    },
+    {
+        fieldDataKey: "relationshipName",
+        columnTitle: "Relationship Name",
+        width: 12,
+        style: {
+            alignment: {vertical: 'top', horizontal: 'left', wrapText: true}
+        }
+    },
+    {
         fieldDataKey: "publisherId",
         columnTitle: "Publisher",
         width: 10,

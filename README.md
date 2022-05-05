@@ -75,6 +75,4 @@ EXAMPLES
   $ sfdx mgk:schema:export --sobject Account,Case,Opportunity,MyCustomObject__c --format xls --targetpath 
   ./dir/example-filename.xls --targetusername myOrg@example.com
 ```
-
-_See code: [lib/commands/mgk/schema/export.js](https://github.com/scottmcclung/mgk-dx-plugin/blob/v1.0.1/lib/commands/mgk/schema/export.js)_
 <!-- commandsstop -->
