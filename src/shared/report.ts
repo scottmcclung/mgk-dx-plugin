@@ -1,14 +1,14 @@
-import ExcelReport from "./excelReport";
-import CsvReport from "./csvReport";
+import CsvReport from './csvReport';
+import ExcelReport from './excelReport';
 
 export default class Report {
-    public static write(format: string, filePath: string, metadata: Map<string, object>) {
+    public static async write(format: string, filePath: string, metadata: Map<string, object>) {
         switch (format) {
             case 'csv':
-                CsvReport.write(filePath, metadata);
+                await CsvReport.write(filePath, metadata);
                 break;
             default:
-                ExcelReport.write(filePath, metadata);
+                await ExcelReport.write(filePath, metadata);
                 break;
         }
     }

@@ -1,14 +1,45 @@
 import {Org} from '@salesforce/core';
+import {Field, FileProperties, QueryResult} from 'jsforce';
+import {DescribeSObjectResult, PicklistEntry} from 'jsforce/describe-result';
 import {translatedFieldTypes} from './exportSettings';
-import {Field, FileProperties, QueryResult} from "jsforce";
-import {DescribeSObjectResult, PicklistEntry} from "jsforce/describe-result";
+
+interface EntityDefinition {
+    DurableId: string;
+    DeveloperName: string;
+    QualifiedApiName: string;
+    KeyPrefix: string;
+    Label: string;
+    PluralLabel: string;
+    ExternalSharingModel: string;
+    InternalSharingModel: string;
+    PublisherId: string;
+    HelpSettingPageName: string;
+    HelpSettingPageUrl: string;
+    RecordTypesSupported: any;
+    LastModifiedDate: string;
+    LastModifiedBy: { Name: string };
+    IsCustomizable: boolean;
+}
+
+interface FieldDefinition {
+    Id: string;
+    BusinessOwner: { Name: string };
+    BusinessStatus: string;
+    ComplianceGroup: string;
+    DurableId: string;
+    Description: string;
+    QualifiedApiName: string;
+    PublisherId: string;
+    RelationshipName: string;
+    SecurityClassification: string;
+}
 
 export default class MetadataExport {
     protected _apiVersion: string;
     protected _org: Org;
     protected _sobjects: string[];
     protected _sobjectMetadata = new Map();
-    protected _fieldMetadata;
+    protected _fieldMetadata: any;
     protected _customObjectsOnly = false;
 
     constructor(settings) {
@@ -37,7 +68,7 @@ export default class MetadataExport {
             ${sobjectFilter}
             ORDER BY QualifiedApiName ASC
             `;
-        const entities: QueryResult<any> = await this._org.getConnection().query(strSoql);
+        const entities: QueryResult<EntityDefinition> = await this._org.getConnection().query(strSoql);
         if (entities.records) {
             for (const object of entities.records) {
                 if (this._customObjectsOnly && !object.QualifiedApiName.endsWith('__c')) continue;
@@ -58,7 +89,6 @@ export default class MetadataExport {
             }
         }
     }
-
 
     protected async loadCustomObjectMetadata() {
         const metadataList: FileProperties[] = await this._org.getConnection().metadata.list([{
@@ -83,8 +113,8 @@ export default class MetadataExport {
      * @param sobjectNames
      * @protected
      */
-    protected async getDescribeMetadata(sobjectNames: string[]): Promise<any> {
-        const metadata: DescribeSObjectResult[] = await this._org.getConnection().batchDescribe({
+    protected async getDescribeMetadata(sobjectNames: string[]): Promise<Map<string, object>> {
+        const metadata: any = await this._org.getConnection().batchDescribe({
             types:     sobjectNames,
             autofetch: true
         });
@@ -109,6 +139,7 @@ export default class MetadataExport {
 
             this._sobjectMetadata.set(object.name, objectDefinition);
         }
+        return this._sobjectMetadata;
     }
 
     protected getFieldDescribeMap(fields: Field[], objectName: string) {
@@ -129,7 +160,7 @@ export default class MetadataExport {
           FROM FieldDefinition
           WHERE EntityDefinition.QualifiedApiName = '${objectName}'
           `;
-        const fieldDefinitions: QueryResult<any> = await this._org.getConnection().tooling.query(fieldDefinitionSoql);
+        const fieldDefinitions: QueryResult<FieldDefinition> = await this._org.getConnection().tooling.query(fieldDefinitionSoql);
         if (fieldDefinitions) {
             fieldDefinitions.records.forEach(field => {
                 fieldDefinitionMap.set(field.QualifiedApiName, {
@@ -137,7 +168,7 @@ export default class MetadataExport {
                     durableId:   field.DurableId,
                     description: field.Description,
                     publisherId: field.PublisherId,
-                    dataOwner: field.BusinessOwner ? field.BusinessOwner.Name : "",
+                    dataOwner: field.BusinessOwner ? field.BusinessOwner.Name : '',
                     fieldUsage: field.BusinessStatus,
                     dataSensitivityLevel: field.SecurityClassification,
                     complianceCategorization: field.ComplianceGroup,
@@ -169,25 +200,25 @@ export default class MetadataExport {
     }
 
     protected formattedDataType(field: Field): string {
-        if (field.type == "reference") {
-            return `${translatedFieldTypes[field.type]}(${field.referenceTo.join(",")})`;
+        if (field.type === 'reference') {
+            return translatedFieldTypes[field.type] + '(' + field.referenceTo.join(',') + ')';
         } else if (field.calculated) {
             return `Formula(${translatedFieldTypes[field.type]})`;
-        } else if (field.type == "picklist" || field.type == "multipicklist" || field.type == "combobox") {
-            let type = "";
+        } else if (field.type === 'picklist' || field.type === 'multipicklist' || field.type === 'combobox') {
+            let type = '';
             type = field.restrictedPicklist ? `Restricted ` : type;
             type = field.dependentPicklist ? `Dependent ${type} ` : type;
-            type = `${type}${translatedFieldTypes[field.type]}(${this.formattedPicklistValues(field.picklistValues)})`;
+            type = type + translatedFieldTypes[field.type] + '(' + this.formattedPicklistValues(field.picklistValues) + ')';
             return type;
-        } else if (field.extraTypeInfo == "richtextarea") {
-            return `Rich Text Area(${field.length})`;
-        } else if (field.type == "string" || field.type == "textarea" || field.type == "url") {
-            return `${translatedFieldTypes[field.type]}(${field.length})`;
-        } else if (field.type == "double" || field.type == "currency" || field.type == "percent") {
-            let fieldLength = field.precision - field.scale;
-            return `${translatedFieldTypes[field.type]}(${fieldLength},${field.scale})`;
-        } else if (field.type == "int") {
-            return `${translatedFieldTypes[field.type]}(${field.digits},0)`;
+        } else if (field.extraTypeInfo === 'richtextarea') {
+            return 'Rich Text Area(' + field.length + ')';
+        } else if (field.type === 'string' || field.type === 'textarea' || field.type === 'url') {
+            return translatedFieldTypes[field.type] + '(' + field.length + ')';
+        } else if (field.type === 'double' || field.type === 'currency' || field.type === 'percent') {
+            const fieldLength = field.precision - field.scale;
+            return translatedFieldTypes[field.type] + '(' + fieldLength + ',' + field.scale + ')';
+        } else if (field.type === 'int') {
+            return translatedFieldTypes[field.type] + '(' + field.digits + ',0)';
         } else {
             return translatedFieldTypes[field.type];
         }
@@ -195,14 +226,14 @@ export default class MetadataExport {
 
     protected formattedDefaultValue(field: Field): string {
         if (field.defaultValueFormula) {
-            return `Formula(${field.defaultValueFormula})`;
+            return 'Formula(' + field.defaultValueFormula + ')';
         }
-        if(field.defaultValue === null) return '';
+        if (field.defaultValue === null) return '';
         return field.defaultValue.toString();
     }
 
     protected formattedPicklistValues(values: PicklistEntry[]): string {
-        return values.map(value => value.label).join(", ");
+        return values.map(value => value.label).join(', ');
     }
 
     protected getObjectType(sobject) {

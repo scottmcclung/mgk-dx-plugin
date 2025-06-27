@@ -1,4 +1,4 @@
-const createCsvWriter = require('csv-writer').createObjectCsvWriter;
+import { createObjectCsvWriter } from 'csv-writer';
 import {headerMap} from './exportSettings';
 
 const headers = () => {
@@ -8,11 +8,11 @@ const headers = () => {
             title: column.columnTitle
         };
     });
-}
+};
 
 export default class CsvReport {
     public static async write(filePath: string, metadata) {
-        const csvWriter = createCsvWriter({
+        const csvWriter = createObjectCsvWriter({
             path: `${filePath}.csv`,
             header: headers()
         });

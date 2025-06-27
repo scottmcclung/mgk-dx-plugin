@@ -1,7 +1,7 @@
-import {Workbook} from "exceljs";
+import {Workbook} from 'exceljs';
 import {headerMap, summaryHeaderMap} from './exportSettings';
 
-const headers = () => {
+const getFieldHeaders = () => {
     return headerMap.map(column => {
         return {
             key:    column.fieldDataKey,
@@ -46,7 +46,7 @@ const generateObjectSummaryWorksheet = (workbook: Workbook, metadata: Map<string
 
 const generateObjectWorksheets = (workbook: Workbook, worksheetName: string, worksheetData) => {
     if (worksheetData.fields) {
-        const worksheet = getWorksheet(workbook, worksheetName, headers());
+        const worksheet = getWorksheet(workbook, worksheetName, getFieldHeaders());
         worksheet.autoFilter = {
             from: 'A1',
             to:   'S1'
@@ -69,20 +69,20 @@ const generateMetadataWithShortObjectNames = (metadata: Map<string, object>) => 
             .from(metadata)
             .map((value, index) => {
                 if (value[0].length <= 31) return value;
-                let length = 31 - index.toString().length
-                value[0] = value[0].substr(0, length) + index.toString()
+                const length = 31 - index.toString().length;
+                value[0] = value[0].substr(0, length) + index.toString();
                 return value;
             })
     );
 };
 
 export default class ExcelReport {
-    public static write(filePath: string, metadata: Map<string, object>) {
+    public static async write(filePath: string, metadata: Map<string, object>) {
         const workbook = new Workbook();
         generateObjectSummaryWorksheet(workbook, metadata);
         for (const [key, sobject] of generateMetadataWithShortObjectNames(metadata).entries()) {
             generateObjectWorksheets(workbook, key, sobject);
         }
-        workbook.xlsx.writeFile(`${filePath}.xlsx`);
+        await workbook.xlsx.writeFile(`${filePath}.xlsx`);
     }
-};
+}
