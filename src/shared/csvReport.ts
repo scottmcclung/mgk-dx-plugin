@@ -20,10 +20,12 @@ export default class CsvReport {
       header: getCsvHeaders(),
     });
 
+    const allRecords: object[] = [];
     for (const sobject of metadata.values()) {
       if (sobject.fields) {
-        await csvWriter.writeRecords(Array.from(sobject.fields.values()));
+        allRecords.push(...Array.from(sobject.fields.values()));
       }
     }
+    await csvWriter.writeRecords(allRecords);
   }
 }

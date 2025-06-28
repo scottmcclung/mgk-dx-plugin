@@ -1,16 +1,17 @@
 # mgk-dx-plugin
+
 Plugin for the Salesforce CLI
 
 ## Features
 
 ### Schema Export
+
 Extracts org metadata to provide a list of objects and fields in a convenient Excel report. (Field attributes include the **Description** field!)
 
-The default behavior is to extract all standard and custom objects.  This will also include the schema for things like External Objects, Platform Events, or Custom Metadata Types.
+The default behavior is to extract all standard and custom objects. This will also include the schema for things like External Objects, Platform Events, or Custom Metadata Types.
 
 - Use the `--customobjectsonly` flag to limit the output to just custom objects.
-- Use the `-s` flag to limit the output to a specific list of objects.  `-s Account,Contact,MyCustomObject__c,MyPlatformEvent__e`
-
+- Use the `-s` flag to limit the output to a specific list of objects. `-s Account,Contact,MyCustomObject__c,MyPlatformEvent__e`
 
 ## Installation into the Salesforce CLI
 
@@ -23,22 +24,26 @@ $ sfdx plugins:install mgk-dx-plugin
 You can check a successful installation with `sfdx plugins`. Updates are applied when executing `sfdx plugins:update`.
 
 ## Salesforce CLI References
+
 More information about the Salesforce CLI can be found at [https://developer.salesforce.com/tools/sfdxcli](https://developer.salesforce.com/tools/sfdxcli)
 <br>
-An admin focused Salesforce CLI tutorial [https://www.youtube.com/watch?v=VMU8xbmqmQ4](https://www.youtube.com/watch?v=VMU8xbmqmQ4) 
-
+An admin focused Salesforce CLI tutorial [https://www.youtube.com/watch?v=VMU8xbmqmQ4](https://www.youtube.com/watch?v=VMU8xbmqmQ4)
 
 ## Commands
+
   <!-- commands -->
-* [`sfdx mgk:schema:export -f xls|csv -p <filepath> [-s <array>] [--customobjectsonly] [-u <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`](#sfdx-mgkschemaexport--f-xlscsv--p-filepath--s-array---customobjectsonly--u-string---apiversion-string---json---loglevel-tracedebuginfowarnerrorfataltracedebuginfowarnerrorfatal)
+
+- [`sfdx mgk:schema:export -f xls|csv -p <filepath> [-s <array>] [--customobjectsonly] [-u <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`](#sfdx-mgkschemaexport--f-xlscsv--p-filepath--s-array---customobjectsonly--u-string---apiversion-string---json---loglevel-tracedebuginfowarnerrorfataltracedebuginfowarnerrorfatal)
 
 ## `sfdx mgk:schema:export -f xls|csv -p <filepath> [-s <array>] [--customobjectsonly] [-u <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`
 
 Exports sobject schema to various formats
 
 ```
+Exports sobject schema to various formats
+
 USAGE
-  $ sfdx mgk:schema:export -f xls|csv -p <filepath> [-s <array>] [--customobjectsonly] [-u <string>] [--apiversion 
+  $ sfdx mgk:schema:export -f xls|csv -p <filepath> [-s <array>] [--customobjectsonly] [-u <string>] [--apiversion
   <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]
 
 OPTIONS
@@ -66,13 +71,14 @@ OPTIONS
 
 EXAMPLES
   $ sfdx mgk:schema:export --format xls --targetpath ./dir/example-filename.xls --targetusername myOrg@example.com
-  $ sfdx mgk:schema:export --format xls --targetpath ./dir/example-filename.xls --customobjectsonly --targetusername 
+  $ sfdx mgk:schema:export --format xls --targetpath ./dir/example-filename.xls --customobjectsonly --targetusername
   myOrg@example.com
-  $ sfdx mgk:schema:export --sobjects=Account --format xls --targetpath ./dir/example-filename.xls --targetusername 
+  $ sfdx mgk:schema:export --sobjects=Account --format xls --targetpath ./dir/example-filename.xls --targetusername
   myOrg@example.com
-  $ sfdx mgk:schema:export --sobjects=Account,Case,Opportunity,MyCustomObject__c --format xls --targetpath 
+  $ sfdx mgk:schema:export --sobjects=Account,Case,Opportunity,MyCustomObject__c --format xls --targetpath
   ./dir/example-filename.xls --targetusername myOrg@example.com
 ```
 
 _See code: [src/commands/mgk/schema/export.ts](https://github.com/scottmcclung/mgk-dx-plugin/blob/v1.0.2/src/commands/mgk/schema/export.ts)_
+
 <!-- commandsstop -->

@@ -61,9 +61,11 @@ const generateObjectWorksheets = (workbook: Workbook, worksheetName: string, wor
 const generateMetadataWithShortObjectNames = (metadata: Map<string, object>) => {
   return new Map(
     Array.from(metadata).map((value, index) => {
-      if (value[0].length <= EXCEL_CONSTRAINTS.MAX_WORKSHEET_NAME_LENGTH) return value;
-      value[0] = truncateWithIndex(value[0], EXCEL_CONSTRAINTS.MAX_WORKSHEET_NAME_LENGTH, index);
-      return value;
+      const key =
+        value[0].length <= EXCEL_CONSTRAINTS.MAX_WORKSHEET_NAME_LENGTH
+          ? value[0]
+          : truncateWithIndex(value[0], EXCEL_CONSTRAINTS.MAX_WORKSHEET_NAME_LENGTH, index);
+      return [key, value[1]];
     }),
   );
 };

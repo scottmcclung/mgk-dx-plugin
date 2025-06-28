@@ -33,10 +33,14 @@ export function sanitizeWorksheetName(name: string, maxLength = 31): string {
 }
 
 /**
- * Formats an array of items with labels into a comma-separated string
- * @param items - Array of items with label property
- * @param delimiter - Delimiter to use (default: ", ")
- * @returns Formatted string
+ * Formats an array of items with labels into a delimited string
+ * @param items - Array of objects that must have a 'label' property
+ * @param delimiter - String to use between items (default: ", ")
+ * @returns A string with all labels joined by the delimiter
+ * @example
+ * const items = [{ label: 'Option A' }, { label: 'Option B' }];
+ * formatList(items); // Returns: "Option A, Option B"
+ * formatList(items, ' | '); // Returns: "Option A | Option B"
  */
 export function formatList<T extends { label: string }>(items: T[], delimiter = ', '): string {
   return items.map((item) => item.label).join(delimiter);
@@ -79,28 +83,31 @@ export function parseCommand(command: string): { name: string; args: string[] } 
 }
 
 /**
+ * Suffix map for Salesforce object types
+ */
+const suffixMap: { [key: string]: string } = {
+  __c: 'Custom',
+  __e: 'Platform Event',
+  __mdt: 'Custom Metadata Type',
+  __xo: 'Salesforce-to-Salesforce',
+  __x: 'External',
+  __Share: 'Custom Object Sharing Object',
+  __Tag: 'Salesforce Tags',
+  __History: 'Custom Object Field History',
+  __hd: 'Historical Data',
+  __b: 'Big Object',
+  __p: 'Custom Person Object',
+  __ChangeEvent: 'Change Data Capture',
+  __chn: 'Change Event Channel',
+  __Feed: 'Custom Object Feed',
+};
+
+/**
  * Determines Salesforce object type based on naming suffix
  * @param objectName - The Salesforce object name
  * @returns The object type description
  */
 export function getObjectTypeBySuffix(objectName: string): string {
-  const suffixMap: { [key: string]: string } = {
-    __c: 'Custom',
-    __e: 'Platform Event',
-    __mdt: 'Custom Metadata Type',
-    __xo: 'Salesforce-to-Salesforce',
-    __x: 'External',
-    __Share: 'Custom Object Sharing Object',
-    __Tag: 'Salesforce Tags',
-    __History: 'Custom Object Field History',
-    __hd: 'Historical Data',
-    __b: 'Big Object',
-    __p: 'Custom Person Object',
-    __ChangeEvent: 'Change Data Capture',
-    __chn: 'Change Event Channel',
-    __Feed: 'Custom Object Feed',
-  };
-
   for (const [suffix, type] of Object.entries(suffixMap)) {
     if (objectName.endsWith(suffix)) {
       return type;
