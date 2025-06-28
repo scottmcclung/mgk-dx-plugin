@@ -6,6 +6,9 @@ import preferArrowPlugin from 'eslint-plugin-prefer-arrow';
 
 export default [
   {
+    ignores: ['lib/**', '**/*.d.ts'],
+  },
+  {
     files: ['src/**/*.ts'],
     languageOptions: {
       parser: typescriptParser,
@@ -32,7 +35,7 @@ export default [
       parserOptions: {
         ecmaVersion: 2018,
         sourceType: 'module',
-        project: './tsconfig.json',
+        project: './test/tsconfig.json',
       },
     },
     plugins: {

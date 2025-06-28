@@ -37,8 +37,6 @@ An admin focused Salesforce CLI tutorial [https://www.youtube.com/watch?v=VMU8xb
 Exports sobject schema to various formats
 
 ```
-Exports sobject schema to various formats
-
 USAGE
   $ sfdx mgk:schema:export -f xls|csv -p <filepath> [-s <array>] [--customobjectsonly] [-u <string>] [--apiversion 
   <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]
@@ -67,12 +65,14 @@ OPTIONS
                                                                                     this command invocation
 
 EXAMPLES
-  $ sfdx mgk:schema:export --format xls --targetpath ./dir/example-filename.xls --targetusername myOrg@example.com 
+  $ sfdx mgk:schema:export --format xls --targetpath ./dir/example-filename.xls --targetusername myOrg@example.com
   $ sfdx mgk:schema:export --format xls --targetpath ./dir/example-filename.xls --customobjectsonly --targetusername 
-  myOrg@example.com 
-  $ sfdx mgk:schema:export --sobject Account --format xls --targetpath ./dir/example-filename.xls --targetusername 
   myOrg@example.com
-  $ sfdx mgk:schema:export --sobject Account,Case,Opportunity,MyCustomObject__c --format xls --targetpath 
+  $ sfdx mgk:schema:export --sobjects=Account --format xls --targetpath ./dir/example-filename.xls --targetusername 
+  myOrg@example.com
+  $ sfdx mgk:schema:export --sobjects=Account,Case,Opportunity,MyCustomObject__c --format xls --targetpath 
   ./dir/example-filename.xls --targetusername myOrg@example.com
 ```
+
+_See code: [src/commands/mgk/schema/export.ts](https://github.com/scottmcclung/mgk-dx-plugin/blob/v1.0.2/src/commands/mgk/schema/export.ts)_
 <!-- commandsstop -->

@@ -1,0 +1,1 @@
+{"root":["./src/index.ts","./src/commands/mgk/schema/export.ts","./src/lib/sfdx.ts","./src/shared/csvreport.ts","./src/shared/excelreport.ts","./src/shared/exportsettings.ts","./src/shared/metadataexport.ts","./src/shared/report.ts"],"version":"5.8.3"}

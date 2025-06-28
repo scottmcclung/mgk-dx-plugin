@@ -253,7 +253,7 @@ export default class MetadataExport {
             return (
                 translatedFieldTypes[field.type] +
                 "(" +
-                field.referenceTo.join(",") +
+                (field.referenceTo?.join(",") || "Unknown") +
                 ")"
             );
         } else if (field.calculated) {
@@ -270,7 +270,7 @@ export default class MetadataExport {
                 type +
                 translatedFieldTypes[field.type] +
                 "(" +
-                this.formattedPicklistValues(field.picklistValues) +
+                this.formattedPicklistValues(field.picklistValues || []) +
                 ")";
             return type;
         } else if (field.extraTypeInfo === "richtextarea") {
@@ -286,7 +286,7 @@ export default class MetadataExport {
             field.type === "currency" ||
             field.type === "percent"
         ) {
-            const fieldLength = field.precision - field.scale;
+            const fieldLength = (field.precision || 0) - (field.scale || 0);
             return (
                 translatedFieldTypes[field.type] +
                 "(" +
@@ -308,7 +308,7 @@ export default class MetadataExport {
         if (field.defaultValueFormula) {
             return "Formula(" + field.defaultValueFormula + ")";
         }
-        if (field.defaultValue === null) return "";
+        if (field.defaultValue === null || field.defaultValue === undefined) return "";
         return field.defaultValue.toString();
     }
 

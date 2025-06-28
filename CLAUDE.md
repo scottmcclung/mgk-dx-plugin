@@ -6,6 +6,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 This is a Salesforce DX (SFDX) CLI plugin that exports Salesforce object schema metadata to Excel or CSV formats. The plugin integrates with the Salesforce CLI ecosystem and provides the command `sfdx mgk:schema:export`.
 
+**Note:** While this plugin uses the legacy `sfdx` command format, the Salesforce CLI has transitioned to the `sf` command. For plugin management and testing, use `sf plugins` commands instead of the deprecated `sfdx plugins` commands.
+
 ## Development Guidelines
 1. Always update the CLAUDE.md file with important learnings or technical design details that need to be documented for all developers.
 2. Always follow a TDD development process to ensure code quality and maintainability.
@@ -25,6 +27,14 @@ npm test
 # Run single test file
 npx mocha --require ts-node/register test/path/to/specific.test.ts
 
+# Run functional tests (requires authenticated org)
+npm run test:functional
+# OR use the bash script
+npm run test:functional:script
+
+# Run all tests (unit + functional)
+npm run test:all
+
 # Lint code with auto-fix
 npm run lint
 
@@ -34,10 +44,10 @@ npm run version
 
 ### Plugin Testing
 ```bash
-# Link plugin for local development
-sfdx plugins:link .
+# Link plugin for local development (use sf, not sfdx)
+sf plugins:link .
 
-# Test the actual command
+# Test the actual command (still uses sfdx command format)
 sfdx mgk:schema:export --format xls --targetpath ./test-output.xls --targetusername your-org@example.com
 ```
 
@@ -96,8 +106,8 @@ Recently migrated from TSLint to ESLint with TypeScript support. Configuration i
 
 ### Plugin Distribution
 - Files distributed: `/lib`, `/messages`, `oclif.manifest.json`
-- Installation: `sfdx plugins:install mgk-dx-plugin`
-- Updates: `sfdx plugins:update`
+- Installation: `sf plugins:install mgk-dx-plugin` (use `sf` not deprecated `sfdx`)
+- Updates: `sf plugins:update`
 
 ## Comprehensive Test Suite
 
@@ -150,3 +160,50 @@ The project maintains **96.57%** statement coverage with comprehensive test suit
 - Includes both `src/` and `test/` directories in compilation
 - Strict type checking with specific allowances for test patterns
 - Proper module resolution for both production and test dependencies
+
+## Functional Testing
+
+### Automated Functional Tests
+The project includes comprehensive functional tests that validate the actual plugin output against real Salesforce orgs:
+
+**Quick Test Commands:**
+```bash
+# Standalone bash script (recommended)
+npm run test:functional:script
+
+# Mocha-based integration tests
+npm run test:functional
+
+# All tests (unit + functional)
+npm run test:all
+```
+
+### Functional Test Coverage
+- **Excel export validation** - File creation, workbook structure, and actual field data validation using ExcelJS
+- **CSV export validation** - Content parsing and field accuracy validation using csv-parser
+- **Custom objects filter** - Validates ALL exported objects have custom naming extensions (e.g., __c, __mdt, __e)
+- **Error handling** - Invalid org and non-existent object handling with graceful failure
+- **Data accuracy** - Field metadata accuracy against known Salesforce schema (Account.Name, Account.Id, picklists)
+- **File output verification** - Deterministic content validation rather than file size checks
+
+### Prerequisites for Functional Testing
+1. **Authenticated Salesforce org** - Default uses alias `nk`, override with `SF_TEST_ORG=your-alias`
+2. **Plugin installation** - Either installed via `sf plugins:install` or linked via `sf plugins:link`
+3. **Network connectivity** - Tests make actual API calls to Salesforce
+
+### Test Execution Without Local Linking
+The functional tests work with any installed version of the plugin:
+- Published npm version: `sf plugins:install mgk-dx-plugin`
+- Local development version: `sf plugins:link .`
+- No need to uninstall/reinstall between test runs
+
+### CSV Parsing Implementation
+Both functional test approaches (Mocha and bash script) use robust CSV parsing:
+- **Mocha tests**: Use the `csv-parser` npm library for RFC 4180 compliant parsing
+- **Bash script**: Uses Node.js with `csv-parser` to handle complex quoted fields, multi-line formulas, and picklist values
+- **No external dependencies**: Only requires Node.js (already needed for the project), no Python or other tools required
+
+### Test Logic Improvements
+- **Custom objects validation**: Updated to ensure ALL exported objects have custom naming extensions when `--customobjectsonly` flag is used, rather than counting objects
+- **Excel validation**: Changed from file size checks to actual field data validation using ExcelJS to read workbook content
+- **Deterministic testing**: All functional tests now validate actual data structure and content rather than indirect metrics
