@@ -1,6 +1,7 @@
 import { SfdxError } from '@salesforce/core';
 import { Dictionary, get } from '@salesforce/ts-types';
 import { spawn, SpawnOptions } from 'child_process';
+import { parseCommand } from '../utils/stringUtils';
 
 export const runCommand = (fullCommand: string): Promise<Dictionary> => {
   const error = new Error(); // Get stack here to use for later
@@ -9,9 +10,7 @@ export const runCommand = (fullCommand: string): Promise<Dictionary> => {
     fullCommand += ' --json';
   }
 
-  const parts = fullCommand.split(' ');
-  const commandName = parts[0];
-  const args = parts.slice(1);
+  const { name: commandName, args } = parseCommand(fullCommand);
 
   const spawnOpt: SpawnOptions = {
     // Always use json in stdout
