@@ -47,6 +47,9 @@ export default class MgkSchemaExport extends SfdxCommand {
 
     public async run() {
         const org = this.org;
+        if (!org) {
+            throw new Error('No target org specified');
+        }
         const format = this.flags.format;
         const sobjects = this.flags.sobjects;
         const targetPath = this.flags.targetpath;

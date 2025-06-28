@@ -21,11 +21,11 @@ export const runCommand = (fullCommand: string): Promise<Dictionary> => {
   return new Promise((resolve, reject) => {
     const cmd = spawn(commandName, args, spawnOpt);
     let stdout = '';
-    cmd.stdout.on('data', data => {
+    cmd.stdout?.on('data', data => {
       stdout += data;
     });
 
-    cmd.stderr.on('data', data => {
+    cmd.stderr?.on('data', data => {
       console.warn('srderr', data);
     });
 
@@ -35,10 +35,10 @@ export const runCommand = (fullCommand: string): Promise<Dictionary> => {
 
     cmd.on('close', code => {
       let json;
-      try { json = JSON.parse(stdout); } catch (e) {
+      try { json = JSON.parse(stdout); } catch {
         console.warn(`No parsable results from command "${fullCommand}"`);
       }
-      if (code > 0) {
+      if (code && code > 0) {
         // Get non-promise stack for extra help
         const sfdxError = SfdxError.wrap(error);
         sfdxError.message = `Command ${commandName} failed with ${get(json, 'message')}`;

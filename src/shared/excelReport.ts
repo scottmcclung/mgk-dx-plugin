@@ -77,8 +77,12 @@ const generateMetadataWithShortObjectNames = (metadata: Map<string, object>) => 
 };
 
 export default class ExcelReport {
+    public static createWorkbook(): Workbook {
+        return new Workbook();
+    }
+
     public static async write(filePath: string, metadata: Map<string, object>) {
-        const workbook = new Workbook();
+        const workbook = ExcelReport.createWorkbook();
         generateObjectSummaryWorksheet(workbook, metadata);
         for (const [key, sobject] of generateMetadataWithShortObjectNames(metadata).entries()) {
             generateObjectWorksheets(workbook, key, sobject);

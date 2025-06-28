@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import * as sinon from 'sinon';
 import { stubMethod } from '@salesforce/ts-sinon';
-import { SfdxCommand } from '@salesforce/command';
+import { Org } from '@salesforce/core';
 import { Config } from '@oclif/config';
 import MgkSchemaExport from '../../../../src/commands/mgk/schema/export';
 import MetadataExport from '../../../../src/shared/metadataExport';
@@ -15,20 +15,22 @@ describe('mgk:schema:export', () => {
 
     beforeEach(() => {
         sandbox = sinon.createSandbox();
-        // Mock the SfdxCommand and its org property
-        stubMethod(sandbox, SfdxCommand.prototype, 'org').get(() => ({
-            getConnection: () => ({
-                query: sandbox.stub(),
-                metadata: {
-                    list: sandbox.stub()
-                },
-                batchDescribe: sandbox.stub(),
-                tooling: {
-                    query: sandbox.stub()
-                }
-            })
-        }));
-        command = new MgkSchemaExport([], new Config({ root: process.cwd() })); // Provide a mocked Config object
+        command = new MgkSchemaExport([], new Config({ root: process.cwd() }));
+
+        const orgStub = sandbox.createStubInstance(Org);
+        const connStub = {
+            query: sandbox.stub(),
+            metadata: {
+                list: sandbox.stub()
+            },
+            batchDescribe: sandbox.stub(),
+            tooling: {
+                query: sandbox.stub()
+            }
+        };
+        (orgStub as any).getConnection.returns(connStub);
+        (command as any).org = orgStub;
+        (command as any).flags = {};
 
         metadataExportStub = stubMethod(sandbox, MetadataExport.prototype, 'getExport');
         reportWriteStub = stubMethod(sandbox, Report, 'write');
@@ -113,5 +115,18 @@ describe('mgk:schema:export', () => {
 
         // Similar to sobjects flag, direct inspection of constructor args is tricky.
         expect(metadataExportStub.calledOnce).to.be.true;
+    });
+
+    it('should throw error when no org is specified', async () => {
+        (command as any).org = undefined;
+        (command as any).flags.format = 'xls';
+        (command as any).flags.targetpath = './test-output.xls';
+
+        try {
+            await command.run();
+            expect.fail('Expected error to be thrown');
+        } catch (error: any) {
+            expect(error.message).to.equal('No target org specified');
+        }
     });
 });
