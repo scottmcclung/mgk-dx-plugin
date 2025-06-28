@@ -1,87 +1,93 @@
 {
-    "name": "mgk-dx-plugin",
-    "version": "1.0.2",
-    "author": "@scottmcclung",
-    "bugs": {
-        "url": "https://github.com/scottmcclung/mgk-dx-plugin/issues"
+  "name": "mgk-dx-plugin",
+  "version": "1.0.2",
+  "author": "@scottmcclung",
+  "bugs": {
+    "url": "https://github.com/scottmcclung/mgk-dx-plugin/issues"
+  },
+  "dependencies": {
+    "@oclif/command": "^1",
+    "@oclif/config": "^1",
+    "@oclif/errors": "^1",
+    "@salesforce/command": "^3.1.0",
+    "@salesforce/core": "^2.23.0",
+    "@salesforce/ts-types": "^1.5.13",
+    "csv-writer": "^1.6.0",
+    "exceljs": "^4.2.1",
+    "tslib": "^1"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^17.0.0",
+    "@commitlint/config-conventional": "^17.0.0",
+    "@oclif/dev-cli": "^1",
+    "@oclif/plugin-help": "^2",
+    "@oclif/test": "^1",
+    "@salesforce/ts-sinon": "^1.4.30",
+    "@types/chai": "^4.3.20",
+    "@types/mocha": "^5",
+    "@types/sinon": "^17.0.4",
+    "@typescript-eslint/eslint-plugin": "^8.35.0",
+    "@typescript-eslint/parser": "^8.35.0",
+    "chai": "^4",
+    "csv-parser": "^3.2.0",
+    "eslint": "^9.30.0",
+    "eslint-plugin-import": "^2.32.0",
+    "eslint-plugin-jsdoc": "^51.2.3",
+    "eslint-plugin-prefer-arrow": "^1.2.3",
+    "globby": "^8",
+    "husky": "^8.0.0",
+    "lint-staged": "^13.0.0",
+    "mocha": "^5",
+    "nyc": "^14",
+    "prettier": "^3.0.0",
+    "ts-node": "^8",
+    "typescript": "^5.8.3"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "files": [
+    "/lib",
+    "/messages",
+    "/npm-shrinkwrap.json",
+    "/oclif.manifest.json"
+  ],
+  "homepage": "https://github.com/scottmcclung/mgk-dx-plugin",
+  "keywords": [
+    "sfdx-plugin"
+  ],
+  "license": "MIT",
+  "oclif": {
+    "commands": "./lib/commands",
+    "bin": "sfdx",
+    "topics": {
+      "mgk:schema": {
+        "description": "Commands to interact with the Salesforce sobject schema."
+      }
     },
-    "dependencies": {
-        "@oclif/command": "^1",
-        "@oclif/config": "^1",
-        "@oclif/errors": "^1",
-        "@salesforce/command": "^3.1.0",
-        "@salesforce/core": "^2.23.0",
-        "@salesforce/ts-types": "^1.5.13",
-        "@typescript-eslint/eslint-plugin": "^8.35.0",
-        "@typescript-eslint/parser": "^8.35.0",
-        "csv-writer": "^1.6.0",
-        "eslint": "^9.30.0",
-        "eslint-plugin-import": "^2.32.0",
-        "eslint-plugin-jsdoc": "^51.2.3",
-        "eslint-plugin-prefer-arrow": "^1.2.3",
-        "exceljs": "^4.2.1",
-        "tslib": "^1"
-    },
-    "devDependencies": {
-        "@oclif/dev-cli": "^1",
-        "@oclif/plugin-help": "^2",
-        "@oclif/test": "^1",
-        "@salesforce/ts-sinon": "^1.4.30",
-        "@types/chai": "^4.3.20",
-        "@types/mocha": "^5",
-        "@types/sinon": "^17.0.4",
-        "chai": "^4",
-        "csv-parser": "^3.2.0",
-        "globby": "^8",
-        "mocha": "^5",
-        "nyc": "^14",
-        "ts-node": "^8",
-        "typescript": "^5.8.3"
-    },
-    "engines": {
-        "node": ">=8.0.0"
-    },
-    "files": [
-        "/lib",
-        "/messages",
-        "/npm-shrinkwrap.json",
-        "/oclif.manifest.json"
-    ],
-    "homepage": "https://github.com/scottmcclung/mgk-dx-plugin",
-    "keywords": [
-        "sfdx-plugin"
-    ],
-    "license": "MIT",
-    "oclif": {
-        "commands": "./lib/commands",
-        "bin": "sfdx",
-        "topics": {
-            "mgk:schema": {
-                "description": "Commands to interact with the Salesforce sobject schema."
-            }
-        },
-        "devPlugins": [
-            "@oclif/plugin-help"
-        ]
-    },
-    "repository": {
-        "type": "git",
-        "url": "git+https://github.com/scottmcclung/mgk-dx-plugin.git"
-    },
-    "scripts": {
-        "lint": "eslint . --ext .ts --fix",
-        "postpack": "rm -f oclif.manifest.json",
-        "posttest": "eslint . --ext .ts --fix",
-        "prepack": "tsc -b && oclif-dev manifest && oclif-dev readme",
-        "test": "nyc --extension .ts mocha --forbid-only --recursive 'test/**/*.test.ts'",
-        "test:functional": "mocha --require ts-node/register --timeout 60000 'test/integration/**/*.test.ts'",
-        "test:all": "npm run test && npm run test:functional",
-        "test:functional:script": "./scripts/functional-test.sh",
-        "version": "oclif-dev readme && git add README.md"
-    },
-    "description": "Plugin for the Salesforce CLI",
-    "main": "index.js",
-    "directories": {
-        "test": "test"
-    }
+    "devPlugins": [
+      "@oclif/plugin-help"
+    ]
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/scottmcclung/mgk-dx-plugin.git"
+  },
+  "scripts": {
+    "lint": "eslint . --ext .ts --fix",
+    "postpack": "rm -f oclif.manifest.json",
+    "posttest": "eslint . --ext .ts --fix",
+    "prepack": "tsc -b && oclif-dev manifest && oclif-dev readme",
+    "test": "nyc --extension .ts mocha --forbid-only --recursive 'test/**/*.test.ts'",
+    "test:functional": "mocha --require ts-node/register --timeout 60000 'test/integration/**/*.test.ts'",
+    "test:all": "npm run test && npm run test:functional",
+    "test:functional:script": "./scripts/functional-test.sh",
+    "version": "oclif-dev readme && git add README.md",
+    "prepare": "husky install"
+  },
+  "description": "Plugin for the Salesforce CLI",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  }
 }
