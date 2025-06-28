@@ -1,0 +1,24 @@
+# Dependencies
+node_modules/
+
+# Build output
+lib/
+*.tsbuildinfo
+
+# Test coverage
+coverage/
+.nyc_output/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+
+# Logs
+*.log
+
+# Package files
+*.tgz
+oclif.manifest.json
