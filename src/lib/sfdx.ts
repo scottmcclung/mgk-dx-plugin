@@ -26,7 +26,7 @@ export const runCommand = (fullCommand: string): Promise<Dictionary> => {
     });
 
     cmd.stderr?.on('data', data => {
-      console.warn('srderr', data);
+      console.warn('stderr', data);
     });
 
     cmd.on('error', data => {
