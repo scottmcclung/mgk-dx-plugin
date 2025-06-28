@@ -2,7 +2,7 @@ import CsvReport from './csvReport';
 import ExcelReport from './excelReport';
 
 export default class Report {
-    public static async write(format: string, filePath: string, metadata: Map<string, object>) {
+    public static async write(format: string, filePath: string, metadata: Map<string, object>): Promise<void> {
         switch (format) {
             case 'csv':
                 await CsvReport.write(filePath, metadata);

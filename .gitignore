@@ -7,3 +7,10 @@
 /tmp
 node_modules
 .idea/
+
+# TypeScript build info
+tsconfig.tsbuildinfo
+
+# Test output
+test-output/
+functional-test-output/
