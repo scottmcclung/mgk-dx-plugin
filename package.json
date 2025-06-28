@@ -89,14 +89,5 @@
   "main": "index.js",
   "directories": {
     "test": "test"
-  },
-  "lint-staged": {
-    "*.{ts,js}": [
-      "eslint --fix",
-      "prettier --write"
-    ],
-    "*.{json,md}": [
-      "prettier --write"
-    ]
   }
 }
