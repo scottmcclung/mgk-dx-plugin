@@ -2,11 +2,28 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { ValidationError, FileSystemError } from '../errors';
 import { EXPORT_FORMATS } from '../config/constants';
+import { IFileSystem } from '../interfaces/filesystem';
 
 /**
  * Validator class for input validation and pre-flight checks
  */
 export class Validator {
+  private static fileSystem: IFileSystem = fs;
+
+  /**
+   * Sets the filesystem implementation (mainly for testing)
+   * @param fs - The filesystem implementation to use
+   */
+  public static setFileSystem(fs: IFileSystem): void {
+    this.fileSystem = fs;
+  }
+
+  /**
+   * Resets the filesystem to the default implementation
+   */
+  public static resetFileSystem(): void {
+    this.fileSystem = fs;
+  }
   /**
    * Validates that the target file path is writable
    * @param filePath - The path where the file will be written
@@ -22,7 +39,7 @@ export class Validator {
 
     // Check if directory exists
     try {
-      const stats = fs.statSync(directory);
+      const stats = this.fileSystem.statSync(directory);
       if (!stats.isDirectory()) {
         throw new ValidationError(`Path is not a directory: ${directory}`, 'targetpath', filePath);
       }
@@ -40,7 +57,7 @@ export class Validator {
 
     // Check write permissions
     try {
-      fs.accessSync(directory, fs.constants.W_OK);
+      this.fileSystem.accessSync(directory, this.fileSystem.constants.W_OK);
     } catch (error) {
       throw new FileSystemError(`No write permission for directory: ${directory}`, directory, error);
     }

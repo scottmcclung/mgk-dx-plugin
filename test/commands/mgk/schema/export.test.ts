@@ -6,7 +6,8 @@ import { Config } from '@oclif/config';
 import MgkSchemaExport from '../../../../src/commands/mgk/schema/export';
 import MetadataExport from '../../../../src/shared/metadataExport';
 import Report from '../../../../src/shared/report';
-import * as fs from 'fs';
+import { Validator } from '../../../../src/shared/validator';
+import { IFileSystem } from '../../../../src/interfaces/filesystem';
 
 describe('mgk:schema:export', () => {
   let sandbox: sinon.SinonSandbox;
@@ -41,13 +42,18 @@ describe('mgk:schema:export', () => {
     metadataExportStub = stubMethod(sandbox, MetadataExport.prototype, 'getExport');
     reportWriteStub = stubMethod(sandbox, Report, 'write');
 
-    // Stub file system for validation
-    sandbox.stub(fs, 'statSync').returns({ isDirectory: () => true } as any);
-    sandbox.stub(fs, 'accessSync').returns(undefined);
+    // Mock file system for validation
+    const mockFs: IFileSystem = {
+      statSync: sandbox.stub().returns({ isDirectory: () => true } as any),
+      accessSync: sandbox.stub().returns(undefined),
+      constants: { W_OK: 2 },
+    };
+    Validator.setFileSystem(mockFs);
   });
 
   afterEach(() => {
     sandbox.restore();
+    Validator.resetFileSystem();
   });
 
   it('should export to Excel format', async () => {

@@ -1,32 +1,35 @@
 import { expect } from 'chai';
 import * as sinon from 'sinon';
-import * as fs from 'fs';
 import { Validator } from '../../src/shared/validator';
 import { ValidationError, FileSystemError } from '../../src/errors';
+import { IFileSystem } from '../../src/interfaces/filesystem';
 
 describe('Validator', () => {
-  let sandbox: sinon.SinonSandbox;
+  let mockFs: IFileSystem;
   let statSyncStub: sinon.SinonStub;
   let accessSyncStub: sinon.SinonStub;
 
   beforeEach(() => {
-    sandbox = sinon.createSandbox();
-    // Create stubs but don't define behavior yet
-    statSyncStub = sandbox.stub(fs, 'statSync');
-    accessSyncStub = sandbox.stub(fs, 'accessSync');
+    // Create mock filesystem
+    statSyncStub = sinon.stub();
+    accessSyncStub = sinon.stub();
+
+    mockFs = {
+      statSync: statSyncStub,
+      accessSync: accessSyncStub,
+      constants: { W_OK: 2 },
+    };
+
+    // Inject mock filesystem
+    Validator.setFileSystem(mockFs);
   });
 
   afterEach(() => {
-    sandbox.restore();
+    // Reset to real filesystem
+    Validator.resetFileSystem();
   });
 
   describe('validateFilePath', () => {
-    beforeEach(() => {
-      // Reset stubs before each test
-      statSyncStub.reset();
-      accessSyncStub.reset();
-    });
-
     it('should throw ValidationError for empty path', () => {
       expect(() => Validator.validateFilePath('')).to.throw(ValidationError, 'File path is required');
       expect(() => Validator.validateFilePath(null as any)).to.throw(ValidationError, 'File path is required');
@@ -44,9 +47,7 @@ describe('Validator', () => {
       );
     });
 
-    // TODO: Fix stubbing issue - the fs.statSync stub is not being applied correctly
-    // This test is temporarily skipped but the implementation is correct
-    it.skip('should throw ValidationError if path is not a directory', () => {
+    it('should throw ValidationError if path is not a directory', () => {
       statSyncStub.returns({ isDirectory: () => false } as any);
       accessSyncStub.returns(undefined);
 
@@ -56,8 +57,7 @@ describe('Validator', () => {
       );
     });
 
-    // TODO: Fix stubbing issue
-    it.skip('should throw FileSystemError for other file system errors', () => {
+    it('should throw FileSystemError for other file system errors', () => {
       const error = new Error('Permission denied');
       (error as any).code = 'EACCES';
       statSyncStub.throws(error);
@@ -68,8 +68,7 @@ describe('Validator', () => {
       );
     });
 
-    // TODO: Fix stubbing issue
-    it.skip('should throw FileSystemError if no write permission', () => {
+    it('should throw FileSystemError if no write permission', () => {
       statSyncStub.returns({ isDirectory: () => true } as any);
       const accessError = new Error('No permission');
       (accessError as any).code = 'EACCES';
@@ -81,8 +80,7 @@ describe('Validator', () => {
       );
     });
 
-    // TODO: Fix stubbing issue
-    it.skip('should pass validation for valid writable path', () => {
+    it('should pass validation for valid writable path', () => {
       statSyncStub.returns({ isDirectory: () => true } as any);
       accessSyncStub.returns(undefined);
 
@@ -178,15 +176,12 @@ describe('Validator', () => {
 
   describe('validateCommandOptions', () => {
     beforeEach(() => {
-      // Reset stubs for these tests
-      statSyncStub.reset();
-      accessSyncStub.reset();
+      // Set default behavior for filesystem mocks
       statSyncStub.returns({ isDirectory: () => true } as any);
       accessSyncStub.returns(undefined);
     });
 
-    // TODO: Fix stubbing issue with fs module
-    it.skip('should validate all options', () => {
+    it('should validate all options', () => {
       const options = {
         format: 'xls',
         targetpath: '/valid/path/file.xls',
@@ -206,8 +201,7 @@ describe('Validator', () => {
       expect(() => Validator.validateCommandOptions(options)).to.throw(ValidationError, 'Invalid export format');
     });
 
-    // TODO: Fix stubbing issue with fs module
-    it.skip('should skip object validation if sobjects not provided', () => {
+    it('should skip object validation if sobjects not provided', () => {
       const options = {
         format: 'csv',
         targetpath: '/valid/path/file.csv',
@@ -216,8 +210,7 @@ describe('Validator', () => {
       expect(() => Validator.validateCommandOptions(options)).to.not.throw();
     });
 
-    // TODO: Fix stubbing issue with fs module
-    it.skip('should skip object validation if sobjects is empty', () => {
+    it('should skip object validation if sobjects is empty', () => {
       const options = {
         format: 'csv',
         targetpath: '/valid/path/file.csv',
