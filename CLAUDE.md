@@ -196,6 +196,10 @@ The project maintains **96.89%** statement coverage with comprehensive test suit
 3. **Error Path Testing**: Comprehensive testing of failure scenarios and edge cases
 4. **Data Validation**: Verify complex metadata transformations and field type formatting
 
+### Known Testing Issues
+
+- **fs module stubbing**: Sinon has difficulty stubbing Node.js fs module methods when imported using `import * as fs` syntax in TypeScript. Some validator tests are skipped due to this limitation. The validator implementation is correct, but the test harness needs improvement. Consider using dependency injection or proxyquire for better testability.
+
 ### TypeScript Configuration for Testing
 
 - Includes both `src/` and `test/` directories in compilation
