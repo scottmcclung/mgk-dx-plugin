@@ -59,18 +59,11 @@ export default class MgkSchemaExport extends SfdxCommand {
       const customObjectsOnly = this.flags.customobjectsonly;
 
       // Validate command options
-      try {
-        Validator.validateCommandOptions({
-          format,
-          targetpath: targetPath,
-          sobjects,
-        });
-      } catch (error) {
-        if (error instanceof ValidationError) {
-          throw new Error(`Invalid command options: ${error.message}`);
-        }
-        throw error;
-      }
+      Validator.validateCommandOptions({
+        format,
+        targetpath: targetPath,
+        sobjects,
+      });
 
       const metadataExport = new MetadataExport({ org, sobjects, customObjectsOnly });
       const metadata: Map<string, object> = await metadataExport.getExport();
