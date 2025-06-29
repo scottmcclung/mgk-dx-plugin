@@ -48,8 +48,9 @@ export default class MgkSchemaExport extends SfdxCommand {
     try {
       const org = this.org;
       if (!org) {
+        const targetUsername = this.flags.targetusername || 'not provided';
         throw new SalesforceConnectionError(
-          'No target org specified. Please specify a target org using --targetusername or set a default org.',
+          `No target org specified. Please specify a target org using --targetusername or set a default org. Current targetusername: ${targetUsername}.`,
         );
       }
 
@@ -78,8 +79,10 @@ export default class MgkSchemaExport extends SfdxCommand {
       // Handle specific error types with appropriate messages
       if (error instanceof SalesforceConnectionError) {
         this.ux.error(`Connection error: ${error.message}`);
+        this.exit(1);
       } else if (error instanceof ValidationError) {
         this.ux.error(`Validation error: ${error.message}`);
+        this.exit(1);
       } else {
         // Let SFDX handle other errors
         throw error;

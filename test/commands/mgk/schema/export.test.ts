@@ -38,6 +38,7 @@ describe('mgk:schema:export', () => {
       warn: sandbox.stub(),
       error: sandbox.stub(),
     };
+    (command as any).exit = sandbox.stub();
 
     metadataExportStub = stubMethod(sandbox, MetadataExport.prototype, 'getExport');
     reportWriteStub = stubMethod(sandbox, Report, 'write');
@@ -142,6 +143,8 @@ describe('mgk:schema:export', () => {
     const errorMessage = (command as any).ux.error.firstCall.args[0];
     expect(errorMessage).to.include('Connection error:');
     expect(errorMessage).to.include('No target org specified');
+    expect(errorMessage).to.include('Current targetusername: not provided');
+    expect((command as any).exit.calledOnceWith(1)).to.be.true;
   });
 
   it('should handle validation errors properly', async () => {
@@ -154,5 +157,6 @@ describe('mgk:schema:export', () => {
     const errorMessage = (command as any).ux.error.firstCall.args[0];
     expect(errorMessage).to.include('Validation error:');
     expect(errorMessage).to.include('Invalid export format');
+    expect((command as any).exit.calledOnceWith(1)).to.be.true;
   });
 });
