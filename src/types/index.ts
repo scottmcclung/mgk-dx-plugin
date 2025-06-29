@@ -13,11 +13,16 @@ export interface ExportConfiguration {
   objectNames?: string[];
 }
 
+/**
+ * Command-line options as they come from SFDX flags.
+ * Note: These use lowercase names to match the actual flag names
+ * (e.g., --targetpath, --sobjects, --customobjectsonly)
+ */
 export interface CommandOptions {
   format: string;
-  targetpath: string;
-  sobjects?: string[];
-  customobjectsonly?: boolean;
+  targetpath: string; // Matches --targetpath flag
+  sobjects?: string[]; // Matches --sobjects flag
+  customobjectsonly?: boolean; // Matches --customobjectsonly flag
 }
 
 // ============================================
