@@ -42,12 +42,16 @@ const generateObjectSummaryWorksheet = (workbook: Workbook, metadata: Map<string
   }
 };
 
-const generateObjectWorksheets = (workbook: Workbook, worksheetName: string, worksheetData) => {
+const generateObjectWorksheets = (
+  workbook: Workbook,
+  worksheetName: string,
+  worksheetData: { fields?: Map<string, Record<string, unknown>> },
+) => {
   if (worksheetData.fields) {
     const worksheet = getWorksheet(workbook, worksheetName, getFieldHeaders());
     worksheet.autoFilter = AUTO_FILTER_RANGES.field;
     for (const field of worksheetData.fields.values()) {
-      worksheet.addRow({ ...field });
+      worksheet.addRow(field);
     }
   }
 };

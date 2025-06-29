@@ -1,7 +1,7 @@
 import { Org } from '@salesforce/core';
-import { DescribeSObjectResult, Field, FileProperties, QueryResult, PicklistEntry } from 'jsforce';
 import { translatedFieldTypes } from './exportSettings';
 import { formatList, getObjectTypeBySuffix } from '../utils/stringUtils';
+import { DescribeSObjectResult, Field, QueryResult, FileProperties, PicklistEntry } from '../types/salesforce';
 
 interface EntityDefinition {
   DurableId: string;
@@ -92,14 +92,14 @@ export default class MetadataExport {
   }
 
   protected async loadCustomObjectMetadata() {
-    const metadataList: FileProperties[] = await this._org.getConnection().metadata.list(
+    const metadataList = (await this._org.getConnection().metadata.list(
       [
         {
           type: 'CustomObject',
         },
       ],
       this._apiVersion,
-    );
+    )) as unknown as FileProperties[];
     if (metadataList) {
       for (const object of metadataList) {
         if (!object.fullName || !this._sobjectMetadata.has(object.fullName)) continue;
@@ -123,10 +123,10 @@ export default class MetadataExport {
    * @protected
    */
   protected async getDescribeMetadata(sobjectNames: string[]): Promise<Map<string, object>> {
-    const metadata: DescribeSObjectResult[] = await this._org.getConnection().batchDescribe({
+    const metadata = (await this._org.getConnection().batchDescribe({
       types: sobjectNames,
       autofetch: true,
-    });
+    })) as unknown as DescribeSObjectResult[];
     for (const object of metadata) {
       if (!this._sobjectMetadata.has(object.name)) {
         continue;
@@ -255,7 +255,7 @@ export default class MetadataExport {
     return formatList(values);
   }
 
-  protected getObjectType(sobject) {
+  protected getObjectType(sobject: { QualifiedApiName: string }) {
     const name: string = sobject.QualifiedApiName;
     return getObjectTypeBySuffix(name);
   }
